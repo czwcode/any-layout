@@ -1,0 +1,68 @@
+{
+  "name": "dnd-layout-base-layer",
+  "version": "0.1.0",
+  "description": "1",
+  "main": "dist/index.js",
+  "keywords": [
+    "hippo",
+    "wdk",
+    "fusion",
+    "layout2"
+  ],
+  "author": {
+    "name": "leo.czw",
+    "email": "leo.czw@alibaba-inc.com"
+  },
+  "builder": {
+    "feature": {
+      "typescript": true
+    }
+  },
+  "scripts": {
+    "lint": "npm run eslint && npm-ensure -t deps",
+    "eslint": "eslint 'src/**/*.@(js|jsx)' --fix",
+    "build-lib": "tsc -p ./tsconfig.build.json",
+    "watch": "tsc -w -p ./tsconfig.build.json",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "src/**/*.@(js|jsx)": [
+      "eslint --fix",
+      "npm-ensure -t deps",
+      "git add"
+    ]
+  },
+  "ensure": {
+    "deps": {
+      "checkDirs": [
+        "src/**/*"
+      ]
+    }
+  },
+  "just": {
+    "type": "component/wdk-comp"
+  },
+  "dependencies": {
+    "dnd-layout-renderer": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^3.4.7",
+    "assert": "^1.4.1",
+    "babel-eslint": "^8.2.6",
+    "enzyme": "^3.4.1",
+    "enzyme-adapter-react-15": "1.x",
+    "eslint": "5.x",
+    "eslint-plugin-import": "2.x",
+    "eslint-plugin-react": "7.x",
+    "husky": "0.x",
+    "lint-staged": "7.x",
+    "mocha": "^6.1.4",
+    "npm-ensure": "1.x",
+    "power-assert": "^1.6.0",
+    "typescript": "^3.7.5"
+  },
+  "publishConfig": {
+    "registry": "http://registry.npm.alibaba-inc.com"
+  },
+  "gitHead": "00b160629a40070fe89780d1953c7d7cddd39df7"
+}
