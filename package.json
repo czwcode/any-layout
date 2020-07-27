@@ -2,14 +2,11 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "start": "yarn workspace dnd-layout-demo start",
     "bootstrap": "lerna bootstrap",
-    "compile": "tsc -p tsconfig.build.json",
     "clean": " lerna exec -- rm -rf node_modules",
     "watch": "lerna run --parallel watch ",
-    "build": "lerna run build",
-    "pub": "tnpm run build && lerna publish ",
-    "publish": "lerna exec -- tnpm publish . --parallel ",
-    "dev": "cd pack"
+    "build": "lerna run build"
   },
   "workspaces": [
     "packages/*",
