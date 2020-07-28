@@ -6,21 +6,32 @@ import {
   Action,
   useLayoutDrop,
   HoverOptions,
+  INode,
+  SizeOptions,
+  DropOptions,
 } from 'dnd-layout-renderer';
 import { ThemeContext } from 'dnd-layout-renderer';
-import { toReal, toVirtual } from '../../../utils/calcWidth';
+import { toReal } from '../../../utils/calcWidth';
 export const AbsoluteLayerType = 'absoluteLayer';
 class RowAction extends Action {
-  onDrag() {}
-  onDrop(dragPath: number[], dropPath: number[], options) {
+  onRemove(): INode {
+    throw new Error("Method not implemented.");
+  }
+  onSizeChange(options: SizeOptions): void {
+    throw new Error("Method not implemented.");
+  }
+  onDrag() {
+    throw new Error("Method not implemented.");
+  }
+  onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
+    const { data } = options
     const lastPath = dragPath[dragPath.length - 1];
-    const { path, node: dragNode } = this.getRemoveItem();
     const node = this.getNode();
     const { movePosition } = options;
     const { x, y } = movePosition;
-    dragNode.x = dragNode.x  + x;
-    dragNode.y = dragNode.y + y;
-    this.getNode().children.splice(lastPath, 0, dragNode);
+    data.x = data.x  + x;
+    data.y = data.y + y;
+    this.getNode().children.splice(lastPath, 0, data);
   }
   onMove(dragPath: number[], dropPath: number[], options: HoverOptions) {}
 }

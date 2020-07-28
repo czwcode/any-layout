@@ -4,17 +4,24 @@ import { getEmptyImage } from 'react-dnd-html5-backend'
 import {
   IAtomRenderer,
   useLayoutDragAndDop,
-  HoverDirection,
   Action,
   SizeOptions,
   DragDirection,
   DropOptions,
+  INode,
+  HoverOptions,
 } from 'dnd-layout-renderer';
-import { calcDirection } from './calcHover';
+import { calcDirection, HoverDirection } from './calcHover';
 import DirectionOverlap from './DirectionOverlap';
 import ActiveFrame from '../SizePanel/ActiveFrame';
 
 class AtomAction extends Action {
+  onRemove(): INode {
+    throw new Error("Method not implemented.");
+  }
+  onMove(dragPath: number[], dropPath: number[], options: HoverOptions): void {
+    throw new Error("Method not implemented.");
+  }
   onDrag() {
     const node = this.getNode();
     if (!this.dispatchOthers('onDrag', ...arguments)) {

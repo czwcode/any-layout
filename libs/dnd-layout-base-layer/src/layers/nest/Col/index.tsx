@@ -3,17 +3,18 @@ import {
   IAtom,
   LayoutType,
   IAtomRenderer,
-  HoverDirection,
   Action,
   ILayout,
   DragDirection,
   SizeOptions,
   ILayoutTheme,
   DropOptions,
+  INode,
+  HoverOptions,
 } from 'dnd-layout-renderer';
 import { ThemeContext } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
-import { calcDirection } from '../Atom/calcHover';
+import { calcDirection, HoverDirection } from '../Atom/calcHover';
 export const ColType = 'col';
 export function getColNode(w: number, data: ILayout) {
   return {
@@ -23,6 +24,12 @@ export function getColNode(w: number, data: ILayout) {
   } as ILayout;
 }
 class ColAction extends Action {
+  onRemove(): INode {
+    throw new Error("Method not implemented.");
+  }
+  onMove(dragPath: number[], dropPath: number[], options: HoverOptions): void {
+    throw new Error("Method not implemented.");
+  }
   onDrag() {
     if (!this.dispatchOthers('onDrag', ...arguments)) {
       // 交互规则，如果当前节点被移除了，希望兄弟节点来填补空白

@@ -3,13 +3,8 @@ import {
   IAtom,
   LayoutType,
   IAtomRenderer,
-  Action,
-  HoverDirection,
-  SizeOptions,
-  DragDirection,
   ILayoutTheme,
   ThemeContext,
-  BaseAction,
 } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
 export const AtomType = 'gridAtom';

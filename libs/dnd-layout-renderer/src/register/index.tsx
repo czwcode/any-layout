@@ -1,5 +1,5 @@
 import React from 'react';
-import { ILayout, Action, HoverDirection, DragDirection } from '../types';
+import { ILayout, Action, DragDirection } from '../types';
 import { ILayoutTheme } from '../types/theme';
 import { HoverOptions, DropOptions } from '../hooks/useDrop';
 import { IAtomFrameRenderer } from '../renderCore';
@@ -10,7 +10,6 @@ export interface IInteractive {
   onDropRow: (dragPath: number[], path: number[], options: DropOptions) => void;
   onDragEnd: (path: number[]) => void;
   onActive: (path: number[]) => void;
-  onHover: (dragPath: number[], hoverPath: number[], options: HoverOptions) => void
   onMove: (dragPath: number[], hoverPath: number[], options: HoverOptions) => void
   onSizeChange: (path: number[], direction: DragDirection, size: number) => void
 }
@@ -48,11 +47,23 @@ const __ATOMS__ = {} as {
   [key: string]: IAtom;
 };
 
+/**
+ * 组件注册的方法
+ *
+ * @export
+ * @param {IAtom} atom
+ */
 export function regist(atom: IAtom) {
   const atomType = atom.atomType;
   __ATOMS__[atomType] = atom;
 }
 
+/**
+ * 获取注册信息的方法
+ *
+ * @export
+ * @returns
+ */
 export function getRegist() {
   return __ATOMS__;
 }

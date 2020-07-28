@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { useDrop, XYCoord, DragElementWrapper } from 'react-dnd';
-import { DragDropType, ILayout } from '../types';
+import { DragDropType, ILayout, ThemeContext, ILayoutTheme } from '../types';
 import { DragInfo } from './useDrag';
+import { ISize } from '../register';
 export interface HoverOptions {
   clientOffset: XYCoord;
   dropBoundingRect: DOMRect;
   movePosition: XYCoord;
+  theme: ILayoutTheme
 }
 export interface DropOptions extends HoverOptions {
   data: ILayout;
@@ -21,7 +23,13 @@ export interface IDropConfig {
     hoverPath: number[],
     options: DropOptions
   ) => void;
+  /**
+   * 当前组件的路径，
+   */
   path?: number[];
+  /**
+   * 支持拖入的的类型
+   */
   accept?: string;
 }
 export interface IDropReturnInfo {
@@ -32,12 +40,14 @@ export const useLayoutDrop = <T extends HTMLElement>(config: IDropConfig) => {
   const ref = React.useRef<T>(null);
   const { onHover, path, accept = DragDropType.Widget, onDrop } = config;
   const positionInfo = React.useRef(null);
+  const theme = React.useContext(ThemeContext)
   const [collectionDropProps, drop] = useDrop<DragInfo, null, IDropReturnInfo>({
     accept: accept,
     drop: (item, monitor) => {
       const clientOffset = monitor.getClientOffset();
       onDrop(item.path, path, {
         clientOffset,
+        theme: theme,
         dropBoundingRect: ref.current.getBoundingClientRect(),
         movePosition: {
           x:
@@ -74,6 +84,7 @@ export const useLayoutDrop = <T extends HTMLElement>(config: IDropConfig) => {
       onHover &&
         onHover(item.path, path, {
           data: JSON.parse(JSON.stringify(item.data)),
+          theme: theme,
           clientOffset,
           dropBoundingRect: ref.current.getBoundingClientRect(),
           movePosition: {

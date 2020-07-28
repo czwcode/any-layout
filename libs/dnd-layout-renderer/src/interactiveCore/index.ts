@@ -1,16 +1,13 @@
 import {
-  INode,
   ILayout,
   SizeOptions,
-  HoverDirection,
   getActionInstance,
 } from '../types';
-import CustomSymbolTree, { filterHideNode } from './CustomSymbolTree';
-import { produce, immerable } from 'immer';
+import TreeSolver from './TreeSolver';
+import { produce } from 'immer';
 import { HoverOptions, DropOptions } from '../hooks';
 
 export default class InteractiveCore {
-  
   /**
    *记录的移除节点的信息
    *
@@ -28,11 +25,11 @@ export default class InteractiveCore {
   /**
    *布局核心代码
    *
-   * @type {CustomSymbolTree}
+   * @type {TreeSolver}
    * @memberof InteractiveCore
    */
-  treeCore: CustomSymbolTree;
-  width: number
+  treeCore: TreeSolver;
+  width: number;
   updateWidth(width: number) {
     this.width = width;
   }
@@ -40,21 +37,21 @@ export default class InteractiveCore {
     this.update(layout);
   }
   get() {
-    return this.treeCore.getAll();
+    return this.treeCore.getLayout();
   }
   restore() {
-    if(this.treeCore.recordRemoveNode) {
+    if (this.treeCore.recordRemoveNode) {
       this.update(this.memeroyLayout);
-      this.clearRemoveNode()
+      this.clearRemoveNode();
     }
   }
   clearRemoveNode() {
-    this.treeCore.recordRemoveNode = null
+    this.treeCore.recordRemoveNode = null;
   }
   update(layout: ILayout[]) {
-    this.treeCore = new CustomSymbolTree(layout);
+    this.treeCore = new TreeSolver(layout);
   }
-  updateCore(core: CustomSymbolTree) {
+  updateCore(core: TreeSolver) {
     this.treeCore = core;
   }
   /**
@@ -65,41 +62,49 @@ export default class InteractiveCore {
   onSizeChange(path: number[], options: SizeOptions) {
     const newCore = produce(this.treeCore, (core) => {
       const node = core.getNode(path);
-      getActionInstance(node, path, core, this.width).onSizeChange(options);
+      getActionInstance(node, path, core).onSizeChange(options);
     });
     this.updateCore(newCore);
   }
 
   onDrag(path: number[]) {
     // 记忆布局，用来回滚
-    this.memeroyLayout = this.treeCore.getAll();
+    this.memeroyLayout = this.treeCore.getLayout();
     const newCore = produce(this.treeCore, (core) => {
       const node = core.getNode(path);
-      getActionInstance(node, path, core, this.width).onDrag();
+      getActionInstance(node, path, core).onDrag();
     });
     this.updateCore(newCore);
   }
   onDrop(dragPath: number[], path: number[], options: DropOptions) {
     const newCore = produce(this.treeCore, (core) => {
       const node = core.getNode(path);
-      getActionInstance(node, path, core, this.width).onDrop(dragPath, path, options);
-      core.recordRemoveNode = null
+      getActionInstance(node, path, core).onDrop(
+        dragPath,
+        path,
+        options
+      );
+      core.recordRemoveNode = null;
     });
     this.updateCore(newCore);
   }
-  onDropRow(path:number[], dropNode:ILayout) {
+  onDropRow(path: number[], dropNode: ILayout) {
     const newCore = produce(this.treeCore, (core) => {
       const node = core.getNode(path);
       // TODO: 自己实现
-      // getActionInstance(node, path, core, this.width).onDrop(HoverDirection.BOTTOM_OUT, dropNode);
+      // getActionInstance(node, path, core).onDrop(HoverDirection.BOTTOM_OUT, dropNode);
     });
     this.updateCore(newCore);
-  } 
-  onMove(dragPath: number[], dropPath: number[], options: HoverOptions){
+  }
+  onMove(dragPath: number[], dropPath: number[], options: HoverOptions) {
     const newCore = produce(this.treeCore, (core) => {
       const node = core.getNode(dropPath);
-      getActionInstance(node, dropPath, core, this.width).onMove(dragPath, dropPath, options);
+      getActionInstance(node, dropPath, core).onMove(
+        dragPath,
+        dropPath,
+        options
+      );
     });
     this.updateCore(newCore);
-  };
+  }
 }

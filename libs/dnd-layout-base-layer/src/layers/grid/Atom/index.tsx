@@ -3,16 +3,23 @@ import PreviewAtom from './preview';
 import {
   IAtomRenderer,
   useLayoutDrag,
-  LayoutType,
   LayerType,
   Action,
   SizeOptions,
   DragDirection,
+  DropOptions,
+  INode,
 } from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
 import { toReal } from '../../../utils/calcWidth';
 
 class AtomAction extends Action {
+  onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
+    throw new Error("Method not implemented.");
+  }
+  onRemove(): INode {
+    throw new Error("Method not implemented.");
+  }
   onDrag() {
     this.removeSelf();
   }

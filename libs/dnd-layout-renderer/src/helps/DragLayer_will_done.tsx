@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { DragLayer, XYCoord, DragLayerMonitor } from 'react-dnd';
 import { CSSProperties } from 'react';
 import { ILayout, LayerType, INode } from '../types';
-import BoxDragPreview from './BoxDragPreview';
 import { DragInfo } from '../hooks/useDrag';
 const layerStyles = {
   position: 'fixed',

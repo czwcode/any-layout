@@ -4,14 +4,16 @@ import {
   LayoutType,
   IAtomRenderer,
   Action,
-  HoverDirection,
   ILayout,
   ILayoutTheme,
   DropOptions,
+  INode,
+  HoverOptions,
+  SizeOptions,
 } from 'dnd-layout-renderer';
 import { getColNode } from '../Col';
 import { ThemeContext } from 'dnd-layout-renderer';
-import { calcDirection } from '../Atom/calcHover';
+import { calcDirection, HoverDirection } from '../Atom/calcHover';
 export const RowType = 'row';
 export function getRowNode(data: ILayout) {
   return {
@@ -20,6 +22,15 @@ export function getRowNode(data: ILayout) {
   } as ILayout;
 }
 class RowAction extends Action {
+  onRemove(): INode {
+    throw new Error("Method not implemented.");
+  }
+  onMove(dragPath: number[], dropPath: number[], options: HoverOptions): void {
+    throw new Error("Method not implemented.");
+  }
+  onSizeChange(options: SizeOptions): void {
+    throw new Error("Method not implemented.");
+  }
   onDrag() {
     if (!this.dispatchOthers('onDrag', ...arguments)) {
       // 交互规则，如果当前节点被移除了，希望兄弟节点来填补空白

@@ -3,4 +3,5 @@ build/
 dist/
 coverage/
 storybook-static/
+docs
 # packages/**/dist

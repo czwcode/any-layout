@@ -9,7 +9,6 @@ const EditContainer = {
     return (
       <div style={{  boxSizing: 'border-box'}}>
         <Renderer {...props} />
-        
       </div>
     );
   },

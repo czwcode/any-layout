@@ -1,4 +1,4 @@
-export * from 'dnd-layout-renderer';
+
 import {
   EditContainer,
   EditContainerPanel,
@@ -10,6 +10,7 @@ import {
   GridAtom,
   GridLayer
 } from 'dnd-layout-base-layer';
+export * from 'dnd-layout-renderer';
 import { regist } from 'dnd-layout-renderer';
 
 regist(EditContainer);

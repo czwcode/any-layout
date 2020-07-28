@@ -10,34 +10,6 @@
     lerna "^3.20.2"
     module-hook "^2.1.3"
 
-"@alifd/field@~1.4.1":
-  version "1.4.4"
-  resolved "https://registry.npm.alibaba-inc.com/@alifd/field/download/@alifd/field-1.4.4.tgz#6d78dd24cf40f8db88f269ee623aa5dc9b1b96af"
-  integrity sha1-bXjdJM9A+NuI8mnuYjql3Jsblq8=
-  dependencies:
-    "@alifd/validate" "^1.2.0"
-    prop-types "^15.5.8"
-
-"@alifd/next@^1.19.10":
-  version "1.20.18"
-  resolved "https://registry.npm.alibaba-inc.com/@alifd/next/download/@alifd/next-1.20.18.tgz#355d02a8ce3fe7996e52ee0295d696c8a9032060"
-  integrity sha1-NV0CqM4/55luUu4CldaWyKkDIGA=
-  dependencies:
-    "@alifd/field" "~1.4.1"
-    "@alifd/validate" "~1.2.0"
-    babel-runtime "^6.26.0"
-    classnames "^2.2.3"
-    hoist-non-react-statics "^2.1.0"
-    prop-types "^15.6.0"
-    react-lifecycles-compat "^3.0.4"
-    react-transition-group "^2.2.1"
-    shallow-element-equals "^1.0.1"
-
-"@alifd/validate@^1.2.0", "@alifd/validate@~1.2.0":
-  version "1.2.0"
-  resolved "https://registry.npm.alibaba-inc.com/@alifd/validate/download/@alifd/validate-1.2.0.tgz#252e0add24e64efd54fe611ba8c66d0147d850f6"
-  integrity sha1-JS4K3STmTv1U/mEbqMZtAUfYUPY=
-
 "@babel/code-frame@7.0.0-beta.44":
   version "7.0.0-beta.44"
   resolved "https://registry.npm.alibaba-inc.com/@babel/code-frame/download/@babel/code-frame-7.0.0-beta.44.tgz#2a02643368de80916162be70865c97774f3adbd9"
@@ -5314,7 +5286,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.3, classnames@^2.2.5, classnames@^2.2.6:
+classnames@^2.2.5:
   version "2.2.6"
   resolved "https://registry.npm.alibaba-inc.com/classnames/download/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
   integrity sha1-Q5Nb/90pHzJtrQogUwmzjQD2UM4=
@@ -6358,13 +6330,6 @@ dom-converter@^0.2:
   integrity sha1-ZyGp2u4uKTaClVtq/kFncWJ7t2g=
   dependencies:
     utila "~0.4"
-
-dom-helpers@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.npm.alibaba-inc.com/dom-helpers/download/dom-helpers-3.4.0.tgz#e9b369700f959f62ecde5a6babde4bccd9169af8"
-  integrity sha1-6bNpcA+Vn2Ls3lprq95LzNkWmvg=
-  dependencies:
-    "@babel/runtime" "^7.1.2"
 
 dom-serializer@0:
   version "0.2.2"
@@ -8164,6 +8129,11 @@ he@1.2.0, he@^1.1.0, he@^1.2.0:
   resolved "https://registry.npm.alibaba-inc.com/he/download/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha1-hK5l+n6vsWX922FWauFLrwVmTw8=
 
+highlight.js@^10.0.0:
+  version "10.1.1"
+  resolved "https://registry.npm.alibaba-inc.com/highlight.js/download/highlight.js-10.1.1.tgz#691a2148a8d922bf12e52a294566a0d993b94c57"
+  integrity sha1-aRohSKjZIr8S5SopRWag2ZO5TFc=
+
 highlight.js@~9.13.0:
   version "9.13.1"
   resolved "https://registry.npm.alibaba-inc.com/highlight.js/download/highlight.js-9.13.1.tgz#054586d53a6863311168488a0f58d6c505ce641e"
@@ -8182,11 +8152,6 @@ hmac-drbg@^1.0.0:
     hash.js "^1.0.3"
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.1"
-
-hoist-non-react-statics@^2.1.0:
-  version "2.5.5"
-  resolved "https://registry.npm.alibaba-inc.com/hoist-non-react-statics/download/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
-  integrity sha1-xZA89AnA39kI84jmGdhrnBF0y0c=
 
 hoist-non-react-statics@^3.0.0, hoist-non-react-statics@^3.3.0:
   version "3.3.2"
@@ -10252,6 +10217,11 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+lunr@^2.3.8:
+  version "2.3.8"
+  resolved "https://registry.npm.alibaba-inc.com/lunr/download/lunr-2.3.8.tgz#a8b89c31f30b5a044b97d2d28e2da191b6ba2072"
+  integrity sha1-qLicMfMLWgRLl9LSji2hkba6IHI=
+
 macos-release@^2.2.0:
   version "2.4.1"
   resolved "https://registry.npm.alibaba-inc.com/macos-release/download/macos-release-2.4.1.tgz#64033d0ec6a5e6375155a74b1a1eba8e509820ac"
@@ -10347,6 +10317,11 @@ markdown-to-jsx@^6.11.4, markdown-to-jsx@^6.9.1:
   dependencies:
     prop-types "^15.6.2"
     unquote "^1.1.0"
+
+marked@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npm.alibaba-inc.com/marked/download/marked-1.0.0.tgz#d35784245a04871e5988a491e28867362e941693"
+  integrity sha1-01eEJFoEhx5ZiKSR4ohnNi6UFpM=
 
 marked@^0.3.12:
   version "0.3.19"
@@ -10635,7 +10610,7 @@ minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
   resolved "https://registry.npm.alibaba-inc.com/minimalistic-crypto-utils/download/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
   integrity sha1-9sAMHAsIIkblxNmd+4x8CDsrWCo=
 
-minimatch@3.0.4, minimatch@^3.0.2, minimatch@^3.0.3, minimatch@^3.0.4:
+minimatch@3.0.4, minimatch@^3.0.0, minimatch@^3.0.2, minimatch@^3.0.3, minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.npm.alibaba-inc.com/minimatch/download/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   integrity sha1-UWbihkV/AzBgZL5Ul+jbsMPTIIM=
@@ -12129,7 +12104,7 @@ process@^0.11.10:
   resolved "https://registry.npm.alibaba-inc.com/process/download/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
   integrity sha1-czIwDoQBYb2j5podHZGn1LwW8YI=
 
-progress@^2.0.0:
+progress@^2.0.0, progress@^2.0.3:
   version "2.0.3"
   resolved "https://registry.npm.alibaba-inc.com/progress/download/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha1-foz42PW48jnBvGi+tOt4Vn1XLvg=
@@ -12198,7 +12173,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@15.7.2, prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.npm.alibaba-inc.com/prop-types/download/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha1-UsQedbjIfnK52TYOAga5ncv/psU=
@@ -12695,13 +12670,6 @@ react-hotkeys@2.0.0:
   dependencies:
     prop-types "^15.6.1"
 
-react-image@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.npm.alibaba-inc.com/react-image/download/react-image-2.4.0.tgz#ef67a32e131c3570cc1eef106c470811bbfa094e"
-  integrity sha1-72ejLhMcNXDMHu8QbEcIEbv6CU4=
-  dependencies:
-    prop-types "15.7.2"
-
 react-inspector@^5.0.1:
   version "5.0.1"
   resolved "https://registry.npm.alibaba-inc.com/react-inspector/download/react-inspector-5.0.1.tgz#8a30f3d488c4f40203624bbe24800f508ae05d3a"
@@ -12790,16 +12758,6 @@ react-textarea-autosize@^8.1.1:
     "@babel/runtime" "^7.10.2"
     use-composed-ref "^1.0.0"
     use-latest "^1.0.0"
-
-react-transition-group@^2.2.1:
-  version "2.9.0"
-  resolved "https://registry.npm.alibaba-inc.com/react-transition-group/download/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"
-  integrity sha1-35zbAleWIRFRpDbGmo87l7WwfI0=
-  dependencies:
-    dom-helpers "^3.4.0"
-    loose-envify "^1.4.0"
-    prop-types "^15.6.2"
-    react-lifecycles-compat "^3.0.4"
 
 react@16.x, react@^16.13.1, react@^16.8.3, react@^16.9.17:
   version "16.13.1"
@@ -13657,13 +13615,6 @@ shallow-clone@^3.0.0:
   dependencies:
     kind-of "^6.0.2"
 
-shallow-element-equals@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npm.alibaba-inc.com/shallow-element-equals/download/shallow-element-equals-1.0.1.tgz#50739b7d94ad7567a134173d3f4422387ed57ce6"
-  integrity sha1-UHObfZStdWehNBc9P0QiOH7VfOY=
-  dependencies:
-    style-equal "^1.0.0"
-
 shallow-equal@^1.1.0:
   version "1.2.1"
   resolved "https://registry.npm.alibaba-inc.com/shallow-equal/download/shallow-equal-1.2.1.tgz#4c16abfa56043aa20d050324efa68940b0da79da"
@@ -13703,7 +13654,7 @@ shell-quote@1.7.2:
   resolved "https://registry.npm.alibaba-inc.com/shell-quote/download/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
   integrity sha1-Z6fQLHbJ2iT5nSCAj8re0ODgS+I=
 
-shelljs@^0.8.3:
+shelljs@^0.8.3, shelljs@^0.8.4:
   version "0.8.4"
   resolved "https://registry.npm.alibaba-inc.com/shelljs/download/shelljs-0.8.4.tgz#de7684feeb767f8716b326078a8a00875890e3c2"
   integrity sha1-3naE/ut2f4cWsyYHiooAh1iQ48I=
@@ -14267,11 +14218,6 @@ strong-log-transformer@^2.0.0:
     duplexer "^0.1.1"
     minimist "^1.2.0"
     through "^2.3.4"
-
-style-equal@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npm.alibaba-inc.com/style-equal/download/style-equal-1.0.0.tgz#98a1c5922226bfe13c196e73f1940e91b8e66595"
-  integrity sha1-mKHFkiImv+E8GW5z8ZQOkbjmZZU=
 
 style-loader@^1.2.1:
   version "1.2.1"
@@ -14893,6 +14839,29 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.npm.alibaba-inc.com/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
+
+typedoc-default-themes@^0.10.2:
+  version "0.10.2"
+  resolved "https://registry.npm.alibaba-inc.com/typedoc-default-themes/download/typedoc-default-themes-0.10.2.tgz#743380a80afe62c5ef92ca1bd4abe2ac596be4d2"
+  integrity sha1-dDOAqAr+YsXvksob1KvirFlr5NI=
+  dependencies:
+    lunr "^2.3.8"
+
+typedoc@^0.17.8:
+  version "0.17.8"
+  resolved "https://registry.npm.alibaba-inc.com/typedoc/download/typedoc-0.17.8.tgz#96b67e9454aa7853bfc4dc9a55c8a07adfd5478e"
+  integrity sha1-lrZ+lFSqeFO/xNyaVciget/VR44=
+  dependencies:
+    fs-extra "^8.1.0"
+    handlebars "^4.7.6"
+    highlight.js "^10.0.0"
+    lodash "^4.17.15"
+    lunr "^2.3.8"
+    marked "1.0.0"
+    minimatch "^3.0.0"
+    progress "^2.0.3"
+    shelljs "^0.8.4"
+    typedoc-default-themes "^0.10.2"
 
 typescript@^3.7.3, typescript@^3.7.4, typescript@^3.7.5:
   version "3.9.7"

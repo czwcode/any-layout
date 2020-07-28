@@ -1,5 +1,11 @@
-import { HoverDirection } from "dnd-layout-renderer"
-
+export enum HoverDirection {
+  TOP = 'top',
+  BOTTOM = 'bottom',
+  LEFT = 'left',
+  RIGHT = 'right',
+  TOP_OUT = 'topOut',
+  BOTTOM_OUT = 'bottomOut',
+}
 export interface Rect {
   top: number
   bottom: number

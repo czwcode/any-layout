@@ -5,12 +5,10 @@ import {
   IAtomRenderer,
   Action,
   useLayoutDrop,
-  HoverOptions,
-  HoverDirection,
   INode,
   DropOptions,
   ILayout,
-  ISize,
+  SizeOptions,
 } from 'dnd-layout-renderer';
 import { ThemeContext } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
@@ -23,28 +21,36 @@ export function usePrevious<T>(value: T) {
   return ref.current;
 }
 class RowAction extends Action {
+  onRemove(): INode {
+    throw new Error("Method not implemented.");
+  }
+  onSizeChange(options: SizeOptions): void {
+    throw new Error("Method not implemented.");
+  }
   onDrag() {}
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
     const lastPath = dragPath[dragPath.length - 1];
-    const { node: dragNode } = this.getRemoveItem();
-    const { data, movePosition } = options;
+    const { data, movePosition, dropBoundingRect } = options;
+    const { width } = dropBoundingRect
     const node = this.getNode();
     node.children = node.children.filter((item) => !item.hidden );
-    relayoutNodes(this.getNode(), lastPath, this.width, options)
+    relayoutNodes(this.getNode(), lastPath, width, options)
     const { x, y } = generatePosition(
       data,
       lastPath,
       movePosition,
-      this.width,
+      width,
       node.children
     );
-    dragNode.x = x;
-    dragNode.y = y;
-    this.getNode().children.splice(lastPath, 0, dragNode);
+    data.x = x;
+    data.y = y;
+    this.getNode().children.splice(lastPath, 0, data);
   }
   onMove(dragPath: number[], dropPath: number[], options: DropOptions) {
     const lastPath = dragPath[dragPath.length - 1];
-    relayoutNodes(this.getNode(), lastPath, this.width, options)
+    const { dropBoundingRect } = options;
+    const { width } = dropBoundingRect
+    relayoutNodes(this.getNode(), lastPath, width , options)
   }
 }
 function relayoutNodes(node: ILayout, index: number, width: number, options: DropOptions) {

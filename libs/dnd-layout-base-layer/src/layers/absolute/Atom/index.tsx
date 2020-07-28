@@ -1,11 +1,45 @@
 import React from 'react';
 import PreviewAtom from './preview';
-import { IAtomRenderer, useLayoutDrag, LayoutType, LayerType } from 'dnd-layout-renderer';
+import { IAtomRenderer, useLayoutDrag, LayoutType, LayerType, Action, INode, SizeOptions, DragDirection, DropOptions } from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
 import { toReal } from '../../../utils/calcWidth';
+class AtomAction extends Action {
+  onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
+    throw new Error("Method not implemented.");
+  }
+  onRemove(): INode {
+    throw new Error("Method not implemented.");
+  }
+  onDrag() {
+    this.removeSelf();
+  }
+  onMove(dragPath, dropPath, options) {
+    const parentAction = this.getParentAction();
+    parentAction.onMove(dragPath, dropPath, options);
+  }
+  onSizeChange(options: SizeOptions) {
+    const { direction, size } = options;
 
+    const node = this.getNode();
+    switch (direction) {
+      case DragDirection.BOTTOM:
+        node.h = size + node.h;
+        break;
+      case DragDirection.LEFT:
+        node.w = size + node.w;
+        break;
+      case DragDirection.RIGHT:
+        node.w = size + node.w;
+        break;
+
+      default:
+        break;
+    }
+  }
+}
 const EditContainer = {
   ...PreviewAtom,
+  action: AtomAction,
   renderer: (props: IAtomRenderer) => {
     const {
       layout,

@@ -7,5 +7,9 @@
       "*": ["libs/*/src"]
     }
   },
+  "typedocOptions": {
+    "mode": "modules",
+    "out": "docs"
+  },
   "include": ["src/**/*"]
 }

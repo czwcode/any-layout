@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { HoverDirection } from 'dnd-layout-renderer';
+import { HoverDirection } from '../calcHover';
 
 
 const StyledDiv = styled.div`

@@ -2,7 +2,6 @@ import React, {
   useRef,
   useState,
   useEffect,
-  RefObject,
   MutableRefObject,
   memo,
 } from 'react';
@@ -14,7 +13,6 @@ import {
   IInteractive,
   IAtomRenderer,
 } from '../register';
-import { HoverDirection } from '../types';
 import InteractiveCore from '../interactiveCore';
 import { SizeMe } from 'react-sizeme';
 import { ThemeContext, ILayoutTheme, defaultTheme } from '../types/theme';
@@ -22,28 +20,52 @@ import DragLayer, { IDragLayerFrameRenderer } from '../helps/DragLayer';
 import { encodePath } from '../utils';
 
 export interface IAtomFrameRenderer {
-  node: INode
+  node: INode;
   width: number;
   height: number;
 }
 
 export interface IRenderCore {
   /**
-   *  主题配置
-   * @default " "
+   *  主题信息配置
+   * @default { nest: {row: { gap: 10 },col: { gap: 10 },atom: { gap: 5 },},grid: {  gapX: 10,  gapY: 5,},}
    */
   theme?: ILayoutTheme;
-  // 布局信息
+  /**
+   * 用来渲染的布局的值
+   */
   layout: ILayout[];
-  // 激活DragSizePanel的布局路径
+  /**
+   * 激活的SizePanel的路径
+   */
   activePath?: number[];
-  // 激活DragSizePanel时的回调
+  /**
+   * 当用户激活SizePanel时的回调
+   */
   onActivePathChange?: (path: number[]) => void;
-  // 布局改变后的回调
+  /**
+   * 布局改变后的回调
+   *
+   * @memberof IRenderCore
+   */
   onLayoutChange: (layout: ILayout[]) => void;
-  atomFrameRenderer?: (props: IAtomFrameRenderer) => React.ReactNode
-  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode
-  // 修改传递给组件的属性
+  /**
+   * 可以通过该方法对Atom展示的内容进行定制
+   *
+   * @memberof IRenderCore
+   */
+  atomFrameRenderer?: (props: IAtomFrameRenderer) => React.ReactNode;
+  /**
+   * 可以通过该方法，对拖拽时候展示的内容进行渲染
+   *
+   * @memberof IRenderCore
+   */
+  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode;
+  /**
+   * 修改传递给组件的属性
+   *  
+   * @memberof IRenderCore
+   */
   generateProps?: (
     layout: ILayout,
     type: string,
@@ -60,17 +82,15 @@ export const useForceUpdate = () => {
 function Wrapper({ children }: { layout: ILayout; children: React.ReactNode }) {
   return <>{children}</>;
 }
-export const MemoWrapper = memo<IAtomRenderer &{ layout: ILayout; children: React.ReactNode }>(
-  Wrapper,
-  (preProps, nextProps) => 
-  {
-    // 布局大小改变，不应该在这里校验
-    const checkAttribute = ['layout', 'activePath']
-    return checkAttribute.every((key) => {
-      return !nextProps[key]  || preProps[key] === nextProps[key]
-    }) 
-  }
-);
+export const MemoWrapper = memo<
+  IAtomRenderer & { layout: ILayout; children: React.ReactNode }
+>(Wrapper, (preProps, nextProps) => {
+  // 布局大小改变，不应该在这里校验
+  const checkAttribute = ['layout', 'activePath'];
+  return checkAttribute.every((key) => {
+    return !nextProps[key] || preProps[key] === nextProps[key];
+  });
+});
 export function RenderCore(props: IRenderCore) {
   const {
     activePath,
@@ -80,17 +100,17 @@ export function RenderCore(props: IRenderCore) {
     generateProps = () => ({}),
     onActivePathChange,
     atomFrameRenderer,
-    dragLayerFrameRenderer
+    dragLayerFrameRenderer,
   } = props;
   const interactiveCoreRef = useRef(new InteractiveCore(layout));
   const layerRef = useRef<HTMLDivElement>(null);
-  const [storeLayout, setStoreLayout] = useState(null)
+  const [storeLayout, setStoreLayout] = useState(null);
   function updateLayout() {
-    setStoreLayout(interactiveCoreRef.current.get())
+    setStoreLayout(interactiveCoreRef.current.get());
   }
   useEffect(() => {
-    interactiveCoreRef.current.update(layout)
-    updateLayout()
+    interactiveCoreRef.current.update(layout);
+    updateLayout();
   }, [layout]);
 
   const [activeStatePath, setActiveStatePath] = useState(activePath);
@@ -155,7 +175,10 @@ export function RenderCore(props: IRenderCore) {
 
       if (layoutType !== LayoutType.Atom) {
         return (
-          <MemoWrapper key={encodePath(currentPath) + '-' + newProps.layout.id} {...newProps}>
+          <MemoWrapper
+            key={encodePath(currentPath) + '-' + newProps.layout.id}
+            {...newProps}
+          >
             <Atom.renderer {...newProps}>
               {traverse({
                 layout: currentLayout.children || [],
@@ -164,11 +187,15 @@ export function RenderCore(props: IRenderCore) {
                 path: currentPath,
               })}
             </Atom.renderer>
-           </MemoWrapper>
+          </MemoWrapper>
         );
       } else {
         return (
-          <MemoWrapper key={encodePath(currentPath) + '-' + newProps.layout.id} layout={newProps.layout} {...newProps}>
+          <MemoWrapper
+            key={encodePath(currentPath) + '-' + newProps.layout.id}
+            layout={newProps.layout}
+            {...newProps}
+          >
             <Atom.renderer {...newProps} />
           </MemoWrapper>
         );
@@ -179,29 +206,36 @@ export function RenderCore(props: IRenderCore) {
     <div
       className='render-core-wrapper'
       ref={layerRef}
-      style={{ background: 'rgb(235,235,235)', overflowX: 'hidden', padding: 12 }}
+      style={{
+        background: 'rgb(235,235,235)',
+        overflowX: 'hidden',
+        padding: 12,
+      }}
     >
       <ThemeContext.Provider value={theme ? theme : defaultTheme}>
-        {
-          layerRef.current && <SizeMe>
-          {({ size }) => {
-            interactiveCoreRef.current.updateWidth(size.width);
-            const { width = 0 } = size;
-            return (
-              <div className='render-core'>
-                {traverse({
-                  layout: storeLayout,
-                  size: {
-                    width,
-                    height: null,
-                  },
-                })}
-              </div>
-            );
-          }}
-        </SizeMe>
-        }
-        <DragLayer dragLayerFrameRenderer={dragLayerFrameRenderer} layerRef={layerRef.current} />
+        {layerRef.current && (
+          <SizeMe>
+            {({ size }) => {
+              interactiveCoreRef.current.updateWidth(size.width);
+              const { width = 0 } = size;
+              return (
+                <div className='render-core'>
+                  {traverse({
+                    layout: storeLayout,
+                    size: {
+                      width,
+                      height: null,
+                    },
+                  })}
+                </div>
+              );
+            }}
+          </SizeMe>
+        )}
+        <DragLayer
+          dragLayerFrameRenderer={dragLayerFrameRenderer}
+          layerRef={layerRef.current}
+        />
       </ThemeContext.Provider>
     </div>
   );
@@ -221,40 +255,39 @@ function createMutators(options: ICreateMutators): IInteractive {
     onLayoutChange,
     setActiveStatePath,
   } = options;
-  
+
   return {
     onDrag: (path: number[]) => {
       console.log('onDrag: ', path);
       interactiveCoreRef.current.onDrag(path);
-      updateLayout()
+      updateLayout();
     },
     onMove: (dragPath: number[], dropPath: number[], options) => {
       interactiveCoreRef.current.onMove(dragPath, dropPath, options);
-      updateLayout()
+      updateLayout();
     },
-    onHover: (dragPath: number[], dropPath: number[], options) => {},
     onDrop: (dragPath: number[], path: number[], options) => {
       interactiveCoreRef.current.onDrop(dragPath, path, options);
       onLayoutChange(interactiveCoreRef.current.get());
-      updateLayout()
+      updateLayout();
     },
     onDropRow: (dragPath: number[], path: number[], options) => {
       interactiveCoreRef.current.onDropRow(path, options.data);
       onLayoutChange(interactiveCoreRef.current.get());
-      updateLayout()
+      updateLayout();
     },
     onDragEnd: (path: number[]) => {
       // 回滚布局变更
       // 拖拽到外面的时候，回滚布局
       interactiveCoreRef.current.restore();
-      updateLayout()
+      updateLayout();
     },
     onSizeChange: (path, direction, size) => {
       interactiveCoreRef.current.onSizeChange(path, {
         direction,
         size,
       });
-      updateLayout()
+      updateLayout();
     },
     onActive: (path) => {
       setActiveStatePath(path);
