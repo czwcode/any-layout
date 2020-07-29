@@ -5,18 +5,18 @@ import { encodePathWithChildren } from '../utils';
 import { get } from '../utils/base';
 enableMapSet();
 
-export function filterHideNode(layout: ILayout[]) {
-  return layout.filter((item) => {
-    item.children = item.children ? filterHideNode(item.children) : [];
-    return item !== null;
-  });
-}
+// export function filterHideNode(layout: ILayout<ITheme>[]) {
+//   return layout.filter((item) => {
+//     item.children = item.children ? filterHideNode(item.children) : [];
+//     return item !== null;
+//   });
+// }
 
-export default class TreeSolver {
+export default class TreeSolver<ITheme> {
   [immerable]: true;
-  recordRemoveNode?: { path: number[]; node: ILayout };
-  layout: ILayout[];
-  constructor(layout: ILayout[], isClean: boolean = false) {
+  recordRemoveNode?: { path: number[]; node: ILayout<ITheme> };
+  layout: ILayout<ITheme>[];
+  constructor(layout: ILayout<ITheme>[], isClean: boolean = false) {
     this[immerable] = true;
     this.layout = layout;
   }
@@ -49,7 +49,7 @@ export default class TreeSolver {
    * @returns {ILayout}
    * @memberof TreeSolver
    */
-  getParent(path: number[]): ILayout {
+  getParent(path: number[]): ILayout<ITheme> {
     return get(
       this.layout,
       encodePathWithChildren(path.slice(0, path.length - 1))
@@ -87,7 +87,7 @@ export default class TreeSolver {
    * @param {ILayout} node
    * @memberof TreeSolver
    */
-  insertBefore(path: number[], node: ILayout) {
+  insertBefore(path: number[], node: ILayout<ITheme>) {
     const parent = this.getParent(path);
     if (parent) {
       parent.children.splice(this.getPathByParent(path), 0, node);
@@ -100,7 +100,7 @@ export default class TreeSolver {
    * @param {ILayout} node
    * @memberof TreeSolver
    */
-  insertAfter(path: number[], node: ILayout) {
+  insertAfter(path: number[], node: ILayout<ITheme>) {
     const parent = this.getParent(path);
     if (parent) {
       parent.children.splice(this.getPathByParent(path) + 1, 0, node);
@@ -128,7 +128,12 @@ export default class TreeSolver {
     return this.getParent(path).children[this.getPathByParent(path) + 1];
   }
 
-  
+  /**
+   * 获取布局信息
+   *
+   * @returns
+   * @memberof TreeSolver
+   */
   getLayout() {
     return this.layout;
   }

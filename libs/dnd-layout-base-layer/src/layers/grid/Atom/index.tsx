@@ -1,5 +1,5 @@
 import React from 'react';
-import PreviewAtom from './preview';
+import PreviewAtom, { getBoundingRect } from './preview';
 import {
   IAtomRenderer,
   useLayoutDrag,
@@ -9,16 +9,19 @@ import {
   DragDirection,
   DropOptions,
   INode,
+  ThemeContext,
+  ISizeContext,
+  SizeContext,
+  IGridLayoutTheme,
 } from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
-import { toReal } from '../../../utils/calcWidth';
 
 class AtomAction extends Action {
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onRemove(): INode {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onDrag() {
     this.removeSelf();
@@ -57,16 +60,13 @@ const EditContainer = {
       onActive,
       layer,
       onSizeChange,
-      hidden,
       onDrag,
       onDragEnd,
       path,
-      size,
     } = props;
-    const { x, y, w, h } = layout;
-    console.log('atom render: ');
-    const Renderer = PreviewAtom.renderer;
-    const atomRef = React.useRef<HTMLDivElement>(null);
+    const theme: IGridLayoutTheme = React.useContext(ThemeContext);
+    console.log('theme: ', theme);
+    const size = React.useContext<ISizeContext>(SizeContext);
     // @ts-ignore
     const [collectDragProps, ref] = useLayoutDrag<HTMLDivElement>({
       onDrag,
@@ -75,16 +75,14 @@ const EditContainer = {
       onDragEnd,
       path,
     });
-    if (hidden) {
-      return <div ref={ref}></div>;
-    }
+    const { width, height, left, top } = getBoundingRect(theme, size, layout);
     return (
       <div
         style={{
-          left: toReal(x, size.width),
-          top: y,
-          width: toReal(w, size.width),
-          height: h,
+          left: left,
+          top: top,
+          width: width,
+          height: height,
           transition: 'all 200ms ease',
           position: 'absolute',
         }}
@@ -93,31 +91,32 @@ const EditContainer = {
           ref={ref}
           style={{ width: '100%', height: '100%', position: 'relative' }}
         >
-          <Renderer {...props} />
-          <ActiveFrame
-            onActive={() => {
-              onActive(path);
-            }}
-            ActiveOperateComponent={() => {
-              return <div></div>;
-            }}
-            activePath={activePath}
-            onSizeChange={(direction, size) => {
-              onSizeChange(path, direction, size);
-            }}
-            layer={layer}
-            path={path}
-          />
-          <div
-            style={{
-              height: '100%',
-              width: '100%',
-              position: 'absolute',
-              boxSizing: 'border-box',
-              top: 0,
-              border: '1px dashed lightgrey',
-            }}
-          ></div>
+          <PreviewAtom.renderer {...props}>
+            <ActiveFrame
+              onActive={() => {
+                onActive(path);
+              }}
+              ActiveOperateComponent={() => {
+                return <div></div>;
+              }}
+              activePath={activePath}
+              onSizeChange={(direction, size) => {
+                onSizeChange(path, direction, size);
+              }}
+              layer={layer}
+              path={path}
+            />
+            <div
+              style={{
+                height: '100%',
+                width: '100%',
+                position: 'absolute',
+                boxSizing: 'border-box',
+                top: 0,
+                border: '1px dashed lightgrey',
+              }}
+            ></div>
+          </PreviewAtom.renderer>
         </div>
       </div>
     );

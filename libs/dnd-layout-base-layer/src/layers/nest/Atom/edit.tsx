@@ -1,6 +1,6 @@
 import React from 'react';
 import PreviewAtom from './preview';
-import { getEmptyImage } from 'react-dnd-html5-backend'
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import {
   IAtomRenderer,
   useLayoutDragAndDop,
@@ -17,10 +17,10 @@ import ActiveFrame from '../SizePanel/ActiveFrame';
 
 class AtomAction extends Action {
   onRemove(): INode {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onMove(dragPath: number[], dropPath: number[], options: HoverOptions): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onDrag() {
     const node = this.getNode();
@@ -29,13 +29,13 @@ class AtomAction extends Action {
       const sibling = this.getPreviousSibling()
         ? this.getPreviousSibling()
         : this.getNextSibling();
-        sibling.h = node.h + sibling.h;
-        this.removeSelf();
+      sibling.h = node.h + sibling.h;
+      this.removeSelf();
     }
   }
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
-    const { clientOffset, dropBoundingRect, data} = options
-    const direction = calcDirection(dropBoundingRect, clientOffset)
+    const { clientOffset, dropBoundingRect, data } = options;
+    const direction = calcDirection(dropBoundingRect, clientOffset);
     const node = this.getNode();
     const parent = this.getParent();
     const parentAction = this.getParentAction();
@@ -81,7 +81,6 @@ const EditContainer = {
   renderer: (props: IAtomRenderer) => {
     const {
       layout,
-      hidden,
       onDrag,
       onDrop,
       onDragEnd,
@@ -93,11 +92,14 @@ const EditContainer = {
     } = props;
     const Renderer = PreviewAtom.renderer;
     const [direction, setDirection] = React.useState<HoverDirection>(null);
-  
+
     // @ts-ignore
-    const [collectDragProps, collectDropProps, ref, preview] = useLayoutDragAndDop<
-      HTMLDivElement
-    >({
+    const [
+      collectDragProps,
+      collectDropProps,
+      ref,
+      preview,
+    ] = useLayoutDragAndDop<HTMLDivElement>({
       onDrag,
       data: JSON.parse(JSON.stringify(layout)),
       onDragEnd,
@@ -115,11 +117,8 @@ const EditContainer = {
       },
     });
     React.useEffect(() => {
-      preview(getEmptyImage(), { captureDraggingState: true })
-    }, [])
-    if (hidden) {
-      return <div ref={ref}></div>;
-    }
+      preview(getEmptyImage(), { captureDraggingState: true });
+    }, []);
     return (
       <div
         ref={ref}
@@ -127,32 +126,33 @@ const EditContainer = {
           position: 'relative',
         }}
       >
-        <div
-          style={{
-            height: '100%',
-            width: '100%',
-            position: 'absolute',
-            boxSizing: 'border-box',
-            top: 0,
-            border: '1px solid lightgrey',
-          }}
-        ></div>
-        {<DirectionOverlap direction={collectDropProps.isOver && direction} />}
-        <Renderer {...props} />
-        <ActiveFrame
-          onActive={() => {
-            onActive(path);
-          }}
-          ActiveOperateComponent={() => {
-            return <div></div>;
-          }}
-          activePath={activePath}
-          onSizeChange={(direction, size) => {
-            onSizeChange(path, direction, size);
-          }}
-          layer={layer}
-          path={path}
-        />
+        <Renderer {...props}>
+          <ActiveFrame
+            onActive={() => {
+              onActive(path);
+            }}
+            ActiveOperateComponent={() => {
+              return <div></div>;
+            }}
+            activePath={activePath}
+            onSizeChange={(direction, size) => {
+              onSizeChange(path, direction, size);
+            }}
+            layer={layer}
+            path={path}
+          />
+          <div
+            style={{
+              height: '100%',
+              width: '100%',
+              position: 'absolute',
+              boxSizing: 'border-box',
+              top: 0,
+              border: '1px solid lightgrey',
+            }}
+          ></div>
+          <DirectionOverlap direction={collectDropProps.isOver && direction} />
+        </Renderer>
       </div>
     );
   },

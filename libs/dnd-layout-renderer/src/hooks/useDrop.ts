@@ -1,27 +1,30 @@
 import * as React from 'react';
 import { useDrop, XYCoord, DragElementWrapper } from 'react-dnd';
-import { DragDropType, ILayout, ThemeContext, ILayoutTheme } from '../types';
+import { DragDropType, ILayout } from '../types';
 import { DragInfo } from './useDrag';
 import { ISize } from '../register';
-export interface HoverOptions {
+import { SizeContext } from '../context';
+import { ThemeContext, getThemeContext } from '../context/theme';
+export interface HoverOptions<ITheme> {
   clientOffset: XYCoord;
   dropBoundingRect: DOMRect;
   movePosition: XYCoord;
-  theme: ILayoutTheme
+  theme: ITheme
+  size: ISize
 }
-export interface DropOptions extends HoverOptions {
-  data: ILayout;
+export interface DropOptions<ITheme> extends HoverOptions<ITheme> {
+  data: ILayout<ITheme>;
 }
-export interface IDropConfig {
+export interface IDropConfig<ITheme> {
   onDrop: (
     dragPath: number[],
     dropPath: number[],
-    options: DropOptions
+    options: DropOptions<ITheme>
   ) => void;
   onHover?: (
     dragPath: number[],
     hoverPath: number[],
-    options: DropOptions
+    options: DropOptions<ITheme>
   ) => void;
   /**
    * 当前组件的路径，
@@ -36,18 +39,20 @@ export interface IDropReturnInfo {
   isOver: boolean;
   canDrop: boolean;
 }
-export const useLayoutDrop = <T extends HTMLElement>(config: IDropConfig) => {
+export const useLayoutDrop = <T extends HTMLElement, ITheme>(config: IDropConfig<ITheme>) => {
   const ref = React.useRef<T>(null);
   const { onHover, path, accept = DragDropType.Widget, onDrop } = config;
   const positionInfo = React.useRef(null);
-  const theme = React.useContext(ThemeContext)
+  const theme = React.useContext(getThemeContext<ITheme>())
+  const size = React.useContext(SizeContext)
   const [collectionDropProps, drop] = useDrop<DragInfo, null, IDropReturnInfo>({
     accept: accept,
     drop: (item, monitor) => {
       const clientOffset = monitor.getClientOffset();
       onDrop(item.path, path, {
         clientOffset,
-        theme: theme,
+        theme,
+        size,
         dropBoundingRect: ref.current.getBoundingClientRect(),
         movePosition: {
           x:
@@ -85,6 +90,7 @@ export const useLayoutDrop = <T extends HTMLElement>(config: IDropConfig) => {
         onHover(item.path, path, {
           data: JSON.parse(JSON.stringify(item.data)),
           theme: theme,
+          size,
           clientOffset,
           dropBoundingRect: ref.current.getBoundingClientRect(),
           movePosition: {

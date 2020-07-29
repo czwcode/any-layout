@@ -3,12 +3,12 @@ import { IDropConfig, useLayoutDrop, IDropReturnInfo } from './useDrop';
 import React from 'react';
 import { DragElementWrapper, DragPreviewOptions } from 'react-dnd';
 
-export const useLayoutDragAndDop = <T extends any>(
-  config: IDragConfig & IDropConfig
+export const useLayoutDragAndDop = <T extends any, ITheme>(
+  config: IDragConfig<ITheme> & IDropConfig<ITheme>
 ) => {
-  const [collectionDragProps, dragRef, drag, preview] = useLayoutDrag(config);
+  const [collectionDragProps, dragRef, drag, preview] = useLayoutDrag<T, ITheme>(config);
   //@ts-ignore
-  const [collectionDropProps, dropRef] = useLayoutDrop<T>(config);
+  const [collectionDropProps, dropRef] = useLayoutDrop<T, ITheme>(config);
   drag(dropRef);
   
   return [collectionDragProps, collectionDropProps, (ref) => {

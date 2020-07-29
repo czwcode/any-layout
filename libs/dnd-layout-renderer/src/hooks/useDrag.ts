@@ -1,21 +1,21 @@
 import * as React from 'react';
 import { useDrag, DragElementWrapper, DragSourceOptions, DragPreviewOptions } from 'react-dnd';
 import { DragDropType, ILayout, LayerType } from '../types';
-export interface IDragConfig {
+export interface IDragConfig<ITheme> {
   onDrag?: (path: number[]) => void;
   onDragEnd?: (path: number[]) => void;
   path?: number[];
-  data?: ILayout;
+  data?: ILayout<ITheme>;
   layerType?: LayerType
   dragType?: string;
 }
-export interface DragInfo {
+export interface DragInfo<ITheme> {
   type: string
   path: number[]
   layerType: LayerType,
-  data: ILayout
+  data: ILayout<ITheme>
 }
-export function useLayoutDrag<T>(config: IDragConfig) {
+export function useLayoutDrag<T, ITheme>(config: IDragConfig<ITheme>) {
   const {
     onDrag,
     data,

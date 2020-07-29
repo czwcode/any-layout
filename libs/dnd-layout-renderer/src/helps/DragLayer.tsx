@@ -34,20 +34,20 @@ export interface ItemStyleProps {
   clientOffset: XYCoord;
 }
 
-export interface IDragLayerFrameRenderer {
-  node: INode;
+export interface IDragLayerFrameRenderer<ITheme> {
+  node: INode<ITheme>;
   layerType: LayerType;
   type: string;
 }
-export interface CustomDragLayerProps {
+export interface CustomDragLayerProps<ITheme> {
   layerRef: HTMLDivElement | null;
-  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode;
+  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer<ITheme>) => React.ReactNode;
   isDragging: boolean;
-  item: DragInfo;
+  item: DragInfo<ITheme>;
 }
 let dragPreviewRef: HTMLDivElement = null;
 let subscribedToOffsetChange = false;
-const CustomDragLayer = (props: CustomDragLayerProps) => {
+const CustomDragLayer = <ITheme extends Object>(props: CustomDragLayerProps<ITheme>) => {
   const { transform } = useDragLayer((monitor) => {
     const transform = getItemStyles({
       initialOffset: monitor.getInitialSourceClientOffset(),
@@ -98,13 +98,13 @@ const onOffsetChange = (monitor: DragLayerMonitor) => () => {
   dragPreviewRef.style['-webkit-transform' as any] = transform;
 };
 
-export default DragLayer((monitor) => {
+export default DragLayer(<ITheme extends Object>(monitor) => {
   if (!subscribedToOffsetChange) {
     (monitor as any).subscribeToOffsetChange(onOffsetChange(monitor));
     subscribedToOffsetChange = true;
   }
   return {
-    item: monitor.getItem() as DragInfo,
+    item: monitor.getItem() as DragInfo<ITheme>,
     itemType: monitor.getItemType(),
     isDragging: monitor.isDragging(),
   };

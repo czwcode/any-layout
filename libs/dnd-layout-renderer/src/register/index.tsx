@@ -1,8 +1,7 @@
 import React from 'react';
 import { ILayout, Action, DragDirection } from '../types';
-import { ILayoutTheme } from '../types/theme';
 import { HoverOptions, DropOptions } from '../hooks/useDrop';
-import { IAtomFrameRenderer } from '../renderCore';
+import { IAtomFrameRenderer } from '../renderCore/Travse';
 
 export interface IInteractive {
   onDrag: (path: number[]) => void;
@@ -10,41 +9,47 @@ export interface IInteractive {
   onDropRow: (dragPath: number[], path: number[], options: DropOptions) => void;
   onDragEnd: (path: number[]) => void;
   onActive: (path: number[]) => void;
-  onMove: (dragPath: number[], hoverPath: number[], options: HoverOptions) => void
-  onSizeChange: (path: number[], direction: DragDirection, size: number) => void
+  onMove: (
+    dragPath: number[],
+    hoverPath: number[],
+    options: HoverOptions
+  ) => void;
+  onSizeChange: (
+    path: number[],
+    direction: DragDirection,
+    size: number
+  ) => void;
 }
 
-export interface IAtomRenderer extends IInteractive {
-  layout: ILayout;
+export interface IAtomRenderer<ITheme> extends IInteractive {
+  layout: ILayout<ITheme>;
   path: number[];
-  size: ISize
   style?: React.CSSProperties;
-  hidden?: boolean;
-  atomFrameRenderer:  (props: IAtomFrameRenderer) => React.ReactNode;
+  atomFrameRenderer: (props: IAtomFrameRenderer) => React.ReactNode;
   children?: React.ReactNode;
-  layer?: HTMLDivElement
+  layer?: HTMLDivElement;
   activePath: number[];
 }
-export interface IAtom {
+export interface IAtom<ITheme> {
   layoutType: string;
   atomType: string;
   action?: typeof Action;
-  sizeProcess?: (config: ISizeProcess) => ISize;
-  renderer: React.ComponentClass<IAtomRenderer> | React.FC<IAtomRenderer>;
+  sizeProcess?: (config: ISizeProcess<ITheme>) => ISize;
+  renderer: React.ComponentClass<IAtomRenderer<ITheme>> | React.FC<IAtomRenderer<ITheme>>;
 }
 
 export interface ISize {
-  width?: number
-  height?: number
+  width?: number;
+  height?: number;
 }
-export interface  ISizeProcess {
-  layout: ILayout
-  parent: ILayout
-  size: ISize
-  theme: ILayoutTheme
+export interface ISizeProcess<ITheme> {
+  layout: ILayout<ITheme>;
+  parent: ILayout<ITheme>;
+  size: ISize;
+  theme: ITheme;
 }
 const __ATOMS__ = {} as {
-  [key: string]: IAtom;
+  [key: string]: IAtom<any>;
 };
 
 /**
@@ -53,7 +58,7 @@ const __ATOMS__ = {} as {
  * @export
  * @param {IAtom} atom
  */
-export function regist(atom: IAtom) {
+export function regist<ITheme>(atom: IAtom<ITheme>) {
   const atomType = atom.atomType;
   __ATOMS__[atomType] = atom;
 }

@@ -11,10 +11,13 @@ import {
   DropOptions,
   INode,
   HoverOptions,
+  IAnyLayoutTheme,
+  INestLayoutTheme,
 } from 'dnd-layout-renderer';
-import { ThemeContext } from 'dnd-layout-renderer';
+import { ThemeContext, ISizeContext } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
 import { calcDirection, HoverDirection } from '../Atom/calcHover';
+import { SizeContext } from '../../../../../dnd-layout-renderer/src/context/sizeContext';
 export const ColType = 'col';
 export function getColNode(w: number, data: ILayout) {
   return {
@@ -92,14 +95,13 @@ const Col: IAtom = {
     };
   },
   renderer: (props: IAtomRenderer) => {
-    const { size } = props;
-    const { width } = size;
-    const theme = React.useContext<ILayoutTheme>(ThemeContext);
+    const { width } = React.useContext<ISizeContext>(SizeContext);
+    const theme: INestLayoutTheme = React.useContext(ThemeContext) ;
     const style = {
       boxSizing: 'border-box',
       position: 'relative',
       transition: 'all 200ms ease',
-      marginRight: theme.nest.col.gap,
+      marginRight: theme.col.gap,
       flex: `1 0 ${width}px`,
       minWidth: `${width}px`,
       maxWidth: `${width}px`,

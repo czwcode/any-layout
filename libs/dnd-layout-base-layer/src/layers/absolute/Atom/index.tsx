@@ -1,6 +1,6 @@
 import React from 'react';
 import PreviewAtom from './preview';
-import { IAtomRenderer, useLayoutDrag, LayoutType, LayerType, Action, INode, SizeOptions, DragDirection, DropOptions } from 'dnd-layout-renderer';
+import { IAtomRenderer, useLayoutDrag, LayoutType, LayerType, Action, INode, SizeOptions, DragDirection, DropOptions, SizeContext } from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
 import { toReal } from '../../../utils/calcWidth';
 class AtomAction extends Action {
@@ -47,11 +47,9 @@ const EditContainer = {
       onActive,
       layer,
       onSizeChange,
-      hidden,
       onDrag,
       onDragEnd,
       path,
-      size,
     } = props;
     const { x, y, w, h } = layout;
     const Renderer = PreviewAtom.renderer;
@@ -63,6 +61,7 @@ const EditContainer = {
       onDragEnd,
       path,
     });
+    const size = React.useContext(SizeContext)
     return (
       <div
         style={{

@@ -5,11 +5,11 @@ import {
   IAtomRenderer,
   Action,
   ILayout,
-  ILayoutTheme,
   DropOptions,
   INode,
   HoverOptions,
   SizeOptions,
+  INestLayoutTheme,
 } from 'dnd-layout-renderer';
 import { getColNode } from '../Col';
 import { ThemeContext } from 'dnd-layout-renderer';
@@ -62,14 +62,14 @@ const Row: IAtom = {
   atomType: RowType,
   action: RowAction,
   renderer: (props: IAtomRenderer) => {
-    const theme = React.useContext<ILayoutTheme>(ThemeContext);
+    const theme: INestLayoutTheme = React.useContext(ThemeContext) ;
     return (
       <div
         className='row'
         style={{
           display: 'flex',
           position: 'relative',
-          marginTop: theme.nest.row.gap,
+          marginTop: theme.row.gap,
         }}
       >
         {props.children}

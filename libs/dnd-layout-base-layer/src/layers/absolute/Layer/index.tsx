@@ -9,6 +9,7 @@ import {
   INode,
   SizeOptions,
   DropOptions,
+  SizeContext,
 } from 'dnd-layout-renderer';
 import { ThemeContext } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
@@ -41,7 +42,9 @@ const Row: IAtom = {
   action: RowAction,
   renderer: (props: IAtomRenderer) => {
     const theme = React.useContext(ThemeContext);
-    const { layout, path, size } = props;
+    const size = React.useContext(SizeContext);
+    const { layout, path } = props;
+
     const { w, h } = layout;
     // @ts-ignore
     const [_, ref] = useLayoutDrop<HTMLDivElement>({

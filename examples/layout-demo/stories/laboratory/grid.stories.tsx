@@ -38,7 +38,7 @@ export const RenderCoreTest = () => {
                         id: '44',
                         type: 'gridAtom',
                         w: 6,
-                        h: 200,
+                        h: 6,
                         x: 6,
                         y: 0
                       },
@@ -46,7 +46,7 @@ export const RenderCoreTest = () => {
                         id: '55',
                         type: 'gridAtom',
                         w: 6,
-                        h: 200,
+                        h: 6,
                         x: 12,
                         y: 0
                       },
@@ -54,7 +54,7 @@ export const RenderCoreTest = () => {
                         id: '66',
                         type: 'gridAtom',
                         w: 6,
-                        h: 200,
+                        h: 6,
                         x: 18,
                         y: 0
                       },
@@ -62,9 +62,9 @@ export const RenderCoreTest = () => {
                         id: '77',
                         type: 'gridAtom',
                         w: 6,
-                        h: 200,
+                        h: 6,
                         x: 18,
-                        y: 200
+                        y: 6
                       },
                     ],
                   },

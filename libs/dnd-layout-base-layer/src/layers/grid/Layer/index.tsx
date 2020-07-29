@@ -9,9 +9,12 @@ import {
   DropOptions,
   ILayout,
   SizeOptions,
+  SizeContext,
+  IGridLayoutTheme,
 } from 'dnd-layout-renderer';
 import { ThemeContext } from 'dnd-layout-renderer';
-import { toReal } from '../../../utils/calcWidth';
+import { toReal, calcXY, PositionParams } from '../../../utils/calcWidth';
+import { getBoundingRect, getPositionParams } from '../Atom/preview';
 export const GridLayerType = 'gridLayer';
 export function usePrevious<T>(value: T) {
   const ref = React.useRef<T>();
@@ -22,21 +25,21 @@ export function usePrevious<T>(value: T) {
 }
 class RowAction extends Action {
   onRemove(): INode {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onSizeChange(options: SizeOptions): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onDrag() {}
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
     const lastPath = dragPath[dragPath.length - 1];
-    const { data, movePosition, dropBoundingRect } = options;
-    const { width } = dropBoundingRect
+    const { data, movePosition, dropBoundingRect, theme, size } = options;
+    const { width } = dropBoundingRect;
     const node = this.getNode();
-    node.children = node.children.filter((item) => !item.hidden );
-    relayoutNodes(this.getNode(), lastPath, width, options)
+    relayoutNodes(this.getNode(), lastPath, width, options);
     const { x, y } = generatePosition(
       data,
+      getPositionParams(theme, size.width),
       lastPath,
       movePosition,
       width,
@@ -49,15 +52,21 @@ class RowAction extends Action {
   onMove(dragPath: number[], dropPath: number[], options: DropOptions) {
     const lastPath = dragPath[dragPath.length - 1];
     const { dropBoundingRect } = options;
-    const { width } = dropBoundingRect
-    relayoutNodes(this.getNode(), lastPath, width , options)
+    const { width } = dropBoundingRect;
+    relayoutNodes(this.getNode(), lastPath, width, options);
   }
 }
-function relayoutNodes(node: ILayout, index: number, width: number, options: DropOptions) {
-  const {  data, movePosition} = options;
+function relayoutNodes(
+  node: ILayout,
+  index: number,
+  width: number,
+  options: DropOptions
+) {
+  const { theme, data, movePosition, size } = options;
   const { w, h } = data;
   const { x, y } = generatePosition(
     data,
+    getPositionParams(theme, size.width),
     index,
     movePosition,
     width,
@@ -149,46 +158,42 @@ const GridLayer: IAtom = {
   atomType: GridLayerType,
   action: RowAction,
   renderer: (props: IAtomRenderer) => {
-    const theme = React.useContext(ThemeContext);
-    const { layout, path, size, onMove } = props;
+    const theme: IGridLayoutTheme = React.useContext(ThemeContext);
+    const size = React.useContext(SizeContext);
+    const { layout, path, onMove } = props;
     const [position, setPosition] = React.useState<{
       data: ILayout;
-      x: number;
-      y: number;
     }>(null);
     const prePosition = usePrevious<{
       data: ILayout;
-      x: number;
-      y: number;
     }>(position);
     // @ts-ignore
     const [_, ref] = useLayoutDrop<HTMLDivElement>({
       path,
       onHover: (dragPath, path, options) => {
         const { data, movePosition } = options;
-        const { x: moveX, y: moveY } = movePosition;
-        const lastPath = dragPath[dragPath.length - 1]
+        const lastPath = dragPath[dragPath.length - 1];
         if (!position) {
-          const { x, y, w, h } = data;
           setPosition({
             data: data,
-            x: x,
-            y: y,
           });
         } else {
           const { x, y } = generatePosition(
             data,
+            getPositionParams(theme, size.width),
             lastPath,
             movePosition,
             size.width,
             layout.children
           );
           // 找到当前合适的位置
-          if (prePosition.x !== x || prePosition.y !== y) {
+          if (prePosition.data.x !== x || prePosition.data.y !== y) {
             setPosition({
-              data: data,
-              x: x,
-              y: y,
+              data: {
+                ...data,
+                x,
+                y,
+              },
             });
             onMove(dragPath, path, options);
           }
@@ -199,6 +204,9 @@ const GridLayer: IAtom = {
         props.onDrop(dragPath, path, options);
       },
     });
+    // placeholder的大小
+    const placeholderBounderRect =
+      position && getBoundingRect(theme, size, position.data);
     return (
       <div
         ref={ref}
@@ -214,12 +222,12 @@ const GridLayer: IAtom = {
         }}
       >
         {props.children}
-        {position && (
+        {position && placeholderBounderRect && (
           <PlaceHolder
-            x={toReal(position.x, size.width)}
-            y={position.y}
-            width={toReal(position.data.w, size.width)}
-            height={position.data.h}
+            x={placeholderBounderRect.left}
+            y={placeholderBounderRect.top}
+            width={placeholderBounderRect.width}
+            height={placeholderBounderRect.height}
           />
         )}
       </div>
@@ -234,21 +242,27 @@ export interface IPlaceHolder {
 }
 function generatePosition(
   dragNode: INode,
+  positionParams: PositionParams,
   index: number,
-  movePosition: any,
+  movePosition: { x: number; y: number },
   width: number,
   nodes: INode[]
 ) {
-  const { x, y, w, h } = dragNode;
-  const { x: moveX, y: moveY } = movePosition;
-  let currentXOffset = x + Math.floor(moveX / (width / 24));
-  currentXOffset = crossBorderProtection(currentXOffset, w);
+  const { id, x, y, w, h } = dragNode;
+  const { x: calcX, y: calcY } = calcXY(positionParams, movePosition.y, movePosition.x,);
+  let currentXOffset = crossBorderProtection(calcX + x, w);
   // 节点当前的水平范围
   const currentXRange: IRange = [currentXOffset, currentXOffset + w];
-  const currentYRange: IRange = [moveY + y, moveY + y + h];
+  const currentYRange: IRange = [calcY + y, calcY + y + h];
   // 当前节点所有上方的节点
-  const intersectItems = getIntersectItems(nodes, currentXRange).filter(item => item.index !== index);
+  
+  console.log('currentXRange: ', currentXRange, currentYRange);
+  const intersectItems = getIntersectItems(nodes, currentXRange).filter(
+    (item) => item.data.id !== id
+    );
+    console.log('intersectItems: ', intersectItems);
   const upperNodes = getAllUpperNode(intersectItems, currentYRange[1]);
+  // console.log('upperNodes: ', movePosition, nodes, upperNodes, currentYRange);
   // 上方节点中最高的Y值
   const newY = getMaxY(upperNodes);
   return { x: currentXOffset, y: newY };
@@ -300,14 +314,15 @@ function getIntersectItems(
   return datas
     .map((item, index) => ({ data: item, index }))
     .filter((item) => {
-      return isIntersect(getRange(item.data).xRange, compareRange) ;
+      return isIntersect(getRange(item.data).xRange, compareRange);
     });
 }
 
-
 function getAllUpperNode(nodes: INodeWithIndex[], targetY: number) {
   return nodes.filter((item) => {
+    
     const currentY = getRange(item.data).yRange[1];
+    console.log(' getRange(item.data): ',  getRange(item.data));
     return currentY < targetY;
   });
 }
