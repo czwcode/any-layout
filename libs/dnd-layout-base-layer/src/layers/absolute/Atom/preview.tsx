@@ -3,8 +3,6 @@ import {
   IAtom,
   LayoutType,
   IAtomRenderer,
-  ILayoutTheme,
-  ThemeContext,
   SizeContext,
 } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
@@ -17,7 +15,6 @@ const Widget: IAtom = {
   renderer: (props: IAtomRenderer) => {
     const { layout,  } = props;
     const size =React.useContext(SizeContext)
-    const theme = React.useContext(ThemeContext);
     const { width, height } = size;
     console.log('width: ', width);
     return (

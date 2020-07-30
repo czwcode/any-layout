@@ -1,19 +1,18 @@
-
-export interface IBaseNode<ITheme> {
+export interface IBaseNode {
   id?: string;
   w?: number;
   h?: number;
-  state?: any
+  state?: any;
   type: string;
-  theme?: ITheme
+  theme?: any;
 }
-export interface INode<ITheme> extends IBaseNode<ITheme>{
+export interface INode extends IBaseNode {
   x?: number;
   y?: number;
 }
 
-export interface ILayout<ITheme> extends INode<ITheme>{
-  children?: ILayout<ITheme>[]
+export interface ILayout extends INode {
+  children?: ILayout[];
 }
 export enum LayoutType {
   Container = 'Container',
@@ -29,4 +28,7 @@ export enum LayerType {
   Nest = 'Nest',
 }
 
-
+export interface XYCoord {
+  x: number;
+  y: number;
+}

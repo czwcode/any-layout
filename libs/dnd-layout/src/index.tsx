@@ -1,4 +1,3 @@
-
 import {
   EditContainer,
   EditContainerPanel,
@@ -8,9 +7,11 @@ import {
   AbsoluteLayer,
   AbsoluteAtom,
   GridAtom,
-  GridLayer
+  GridLayer,
+  NestLayer
 } from 'dnd-layout-base-layer';
 export * from 'dnd-layout-renderer';
+export { default as AnyLayout } from 'dnd-layout-base-layer';
 import { regist } from 'dnd-layout-renderer';
 
 regist(EditContainer);
@@ -22,3 +23,4 @@ regist(AbsoluteLayer);
 regist(AbsoluteAtom);
 regist(GridLayer);
 regist(GridAtom);
+regist(NestLayer);

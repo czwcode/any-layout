@@ -1,14 +1,26 @@
 import React from 'react';
 import PreviewAtom from './preview';
-import { IAtomRenderer, useLayoutDrag, LayoutType, LayerType, Action, INode, SizeOptions, DragDirection, DropOptions, SizeContext } from 'dnd-layout-renderer';
+import {
+  IAtomRenderer,
+  LayerType,
+  Action,
+  INode,
+  DropOptions,
+  SizeContext,
+  DragDirection,
+  SizeOptions,
+} from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
 import { toReal } from '../../../utils/calcWidth';
+import { useAnyLayoutDrag } from '../../../hooks/useAnyDrag';
+import { calcMovePosition } from '../../../utils/calcPosition';
+import { IAnySizeOptions } from '../../../types/layout';
 class AtomAction extends Action {
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onRemove(): INode {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   onDrag() {
     this.removeSelf();
@@ -17,19 +29,22 @@ class AtomAction extends Action {
     const parentAction = this.getParentAction();
     parentAction.onMove(dragPath, dropPath, options);
   }
-  onSizeChange(options: SizeOptions) {
-    const { direction, size } = options;
-
+  onSizeChange(path: number[], options: IAnySizeOptions) {
+    const { direction, mouseClientOffset, originMouseClientOffset } = options;
+    const { x, y } = calcMovePosition(
+      originMouseClientOffset,
+      mouseClientOffset
+    );
     const node = this.getNode();
     switch (direction) {
       case DragDirection.BOTTOM:
-        node.h = size + node.h;
+        node.h = y + node.h;
         break;
       case DragDirection.LEFT:
-        node.w = size + node.w;
+        node.w = x + node.w;
         break;
       case DragDirection.RIGHT:
-        node.w = size + node.w;
+        node.w = x + node.w;
         break;
 
       default:
@@ -54,14 +69,14 @@ const EditContainer = {
     const { x, y, w, h } = layout;
     const Renderer = PreviewAtom.renderer;
     // @ts-ignore
-    const [collectDragProps,ref] = useLayoutDrag<HTMLDivElement>({
+    const [collectDragProps, ref] = useAnyLayoutDrag<HTMLDivElement>({
       onDrag,
       layerType: LayerType.Absolute,
       data: JSON.parse(JSON.stringify(layout)),
       onDragEnd,
       path,
     });
-    const size = React.useContext(SizeContext)
+    const size = React.useContext(SizeContext);
     return (
       <div
         style={{
@@ -97,8 +112,11 @@ const EditContainer = {
               return <div></div>;
             }}
             activePath={activePath}
-            onSizeChange={(direction, size) => {
-              onSizeChange(path, direction, size);
+            onSizeChange={(options) => {
+              onSizeChange(path, {
+                ...options,
+                size,
+              });
             }}
             layer={layer}
             path={path}

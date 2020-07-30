@@ -1,8 +1,8 @@
 import React from 'react';
-import { useLayoutDrop, ILayout, IDropConfig } from 'dnd-layout-renderer';
+import { useLayoutDrop, ILayout, IDropConfig, DropOptions } from 'dnd-layout-renderer';
 
-export interface IPlaceHolder extends IDropConfig {
-  layout: ILayout<any>;
+export interface IPlaceHolder extends IDropConfig<DropOptions> {
+  layout: ILayout;
   style?: React.CSSProperties;
 }
 export default function PlaceHolder(props: IPlaceHolder) {

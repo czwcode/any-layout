@@ -1,29 +1,30 @@
 import React, { useContext } from 'react';
-import { ILayout, LayoutType, INode } from "../types";
-import { getRegist, ISizeProcess, IAtomRenderer, IInteractive } from "../register";
+import { ILayout, LayoutType, INode } from '../types';
+import {
+  getRegist,
+  ISizeProcess,
+  IAtomRenderer,
+  IInteractive,
+} from '../register';
 import { getMemoWrapper } from './MemoWrapper';
-import ContextProcess from '../context/ContextProcess';
-import { SizeContext } from '../context/sizeContext';
 import { IDragLayerFrameRenderer } from '../helps/DragLayer';
-import { getThemeContext } from '../context/theme';
 
-export interface IAtomFrameRenderer<ITheme> {
-  node: INode<ITheme>;
+export interface IAtomFrameRenderer {
+  node: INode;
   width: number;
   height: number;
 }
 
-
-export interface IRenderCore<ITheme> {
+export interface IRenderCore {
   /**
    *  主题信息配置
    * @default { nest: {row: { gap: 10 },col: { gap: 10 },atom: { gap: 5 },},grid: {  gapX: 10,  gapY: 5,},}
    */
-  theme?: ITheme;
+  theme?: any;
   /**
    * 用来渲染的布局的值
    */
-  layout: ILayout<ITheme>[];
+  layout: ILayout[];
   /**
    * 激活的SizePanel的路径
    */
@@ -37,50 +38,57 @@ export interface IRenderCore<ITheme> {
    *
    * @memberof IRenderCore
    */
-  onLayoutChange: (layout: ILayout<ITheme>[]) => void;
+  onLayoutChange: (layout: ILayout[]) => void;
   /**
    * 可以通过该方法对Atom展示的内容进行定制
    *
    * @memberof IRenderCore
    */
-  atomFrameRenderer?: (props: IAtomFrameRenderer<ITheme>) => React.ReactNode;
+  atomFrameRenderer?: (props: IAtomFrameRenderer) => React.ReactNode;
+  /**
+   * 遍历布局信息，递归渲染布局节点的包裹组件
+   *
+   * @memberof IRenderCore
+   */
+  TravseRendererFrame?: (props: ITravseRendererFrame) => JSX.Element;
   /**
    * 可以通过该方法，对拖拽时候展示的内容进行渲染
    *
    * @memberof IRenderCore
    */
-  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer<ITheme>) => React.ReactNode;
+  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode;
   /**
    * 修改传递给组件的属性
    *
    * @memberof IRenderCore
    */
   generateProps?: (
-    layout: ILayout<ITheme>,
+    layout: ILayout,
     type: string,
     layoutType: LayoutType
   ) => any;
 }
-interface ITraverse<ITheme> extends IRenderCore<ITheme>{
-  parent?: ILayout<ITheme>;
+interface ITraverse extends IRenderCore {
+  parent?: ILayout;
   path?: number[];
-  getActivePath: () => void
-  interactiveProps: IInteractive
-  layerRef: React.MutableRefObject<HTMLDivElement>
+  getActivePath: () => void;
+  interactiveProps: IInteractive;
+  layerRef: React.MutableRefObject<HTMLDivElement>;
 }
-function defaultSizeProcess(options: ISizeProcess<any>) {
-  const { layout, size } = options;
-  const { w, h } = layout;
-  const { width, height } = size;
-  return {
-    width: width || width === 0 ? width : w,
-    height: height || h,
-  };
-}
-export function Traverse<ITheme>(props: ITraverse<ITheme>) {
-  const { layout, interactiveProps,getActivePath,layerRef, parent, path = [], atomFrameRenderer, generateProps, } = props;
-  const size = useContext(SizeContext)
-  const theme = useContext(getThemeContext<ITheme>())
+
+export function Traverse(props: ITraverse) {
+  const {
+    layout,
+    interactiveProps,
+    getActivePath,
+    layerRef,
+    parent,
+    path = [],
+    atomFrameRenderer,
+    generateProps,
+    TravseRendererFrame = DefaultTravseRendererFrame,
+  } = props;
+  
   return (
     <>
       {layout.map((currentLayout, index) => {
@@ -89,18 +97,17 @@ export function Traverse<ITheme>(props: ITraverse<ITheme>) {
         const atoms = getRegist();
         const Atom = atoms[type];
         const layoutType = Atom.layoutType;
-        const sizeProcess = Atom.sizeProcess || defaultSizeProcess;
-
         const currentPath = [...path, index];
-
-        const newProps: IAtomRenderer<ITheme> = {
+        const newProps: IAtomRenderer = {
           layout: currentLayout,
           path: currentPath,
           atomFrameRenderer: atomFrameRenderer,
           activePath: getActivePath(),
           layer: layerRef.current,
+          parent: parent,
           ...interactiveProps,
-          ...generateProps(currentLayout, type, layoutType as any),
+          ...(generateProps &&
+            generateProps(currentLayout, type, layoutType as any)),
         };
 
         let child = null;
@@ -114,35 +121,29 @@ export function Traverse<ITheme>(props: ITraverse<ITheme>) {
             />
           );
         }
-        const afterProcessSize = sizeProcess({
-          layout: currentLayout,
-          theme,
-          parent,
-          size,
-        });
-        const MemoWrapper = getMemoWrapper<ITheme>()
+       
+        const MemoWrapper = getMemoWrapper();
         return (
           <MemoWrapper key={newProps.layout.id} {...newProps}>
-            <ContextProcess
-              enable={layoutType === LayoutType.Layer}
-              Ctx={getThemeContext<ITheme>()}
-              value={
-                layoutType === LayoutType.Layer
-                  ? theme[type] || currentLayout.theme
-                  : null
-              }
-            >
-              <ContextProcess
-                enable={layoutType === LayoutType.Layout}
-                Ctx={SizeContext}
-                value={afterProcessSize}
-              >
-                <Atom.renderer {...newProps}>{child}</Atom.renderer>
-              </ContextProcess>
-            </ContextProcess>
+            <TravseRendererFrame {...newProps} layoutType={layoutType} >
+              <Atom.renderer {...newProps}>{child}</Atom.renderer>
+            </TravseRendererFrame>
           </MemoWrapper>
         );
       })}
     </>
   );
+}
+
+
+export interface ITravseRendererFrame {
+  children?: React.ReactNode;
+  layout: ILayout
+  parent?: ILayout
+  path: number[]
+  layoutType: LayoutType
+}
+function DefaultTravseRendererFrame(props: ITravseRendererFrame) {
+  const { children } = props;
+  return <>{children}</>;
 }

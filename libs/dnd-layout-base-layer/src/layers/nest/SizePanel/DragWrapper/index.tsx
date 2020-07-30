@@ -4,13 +4,22 @@ import { produce } from 'immer';
 import React from 'react';
 import { get } from 'lodash';
 import { useEventListener } from '../useEventListener';
-import { InteractiveCore, ILayout, DragDirection } from 'dnd-layout-renderer';
+import {
+  InteractiveCore,
+  ILayout,
+  DragDirection,
+  XYCoord,
+} from 'dnd-layout-renderer';
 export interface DragPaneWrapperProps {
   path: number[];
-  onSizeChange: (direction: DragDirection, size: number) => void;
+  onSizeChange: (options: {
+    direction: DragDirection;
+    originMouseClientOffset: XYCoord;
+    mouseClientOffset: XYCoord;
+  }) => void;
   parent?: ILayout;
-  widgetLayer?: HTMLDivElement | null
-  layer: HTMLDivElement | null
+  widgetLayer?: HTMLDivElement | null;
+  layer: HTMLDivElement | null;
 }
 
 export interface DragPaneWrapperState {
@@ -20,11 +29,13 @@ export interface DragPaneWrapperState {
   isSizeDragging: boolean;
   initialPosX: number;
   initialPosY: number;
+  currentX: number;
+  currentY: number;
 }
 // export default () => <div />
 export default function DragPaneWrapper(props: DragPaneWrapperProps) {
   const { parent, path, onSizeChange, layer, widgetLayer } = props;
-  const width = layer.getBoundingClientRect().width
+  const width = layer.getBoundingClientRect().width;
   const deltaRef = useRef<{ deltaX: number; deltaY: number }>({
     deltaX: 0,
     deltaY: 0,
@@ -39,6 +50,8 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
     isSizeDragging: false,
     initialPosX: 0,
     initialPosY: 0,
+    currentX: 0,
+    currentY: 0,
   });
   const {
     isSizeDragging,
@@ -95,35 +108,45 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
   );
 
   // // useCallback 防止function重复被定义
-  const stopResize = useCallback(() => {
-    if (isSizeDragging) {
-      const { deltaY, deltaX } = deltaRef.current;
-      onSizeChange(
-        activeDragBarDirection,
-        activeDragBarDirection === DragDirection.BOTTOM
-          ? deltaY
-          : Math.round(deltaX / (width / 24))
-      );
-      setDragPaneWrapperState((dragPaneWrapperState) => {
-        return produce(
-          dragPaneWrapperState,
-          (dragPaneWrapperState: DragPaneWrapperState) => {
-            dragPaneWrapperState.isSizeDragging = false;
-            dragPaneWrapperState.activeDragBarDirection = null;
-            dragPaneWrapperState.deltaX = 0;
-            dragPaneWrapperState.deltaY = 0;
-          }
-        );
-      });
-    }
-  }, [isSizeDragging]);
+  const stopResize = useCallback(
+    (event: React.MouseEvent) => {
+      if (isSizeDragging) {
+        const { deltaY, deltaX } = deltaRef.current;
+        const x = event.clientX;
+        const y = event.clientY;
+        onSizeChange({
+          direction: activeDragBarDirection,
+          originMouseClientOffset: {
+            x: dragPaneWrapperState.initialPosX,
+            y: dragPaneWrapperState.initialPosY,
+          },
+          mouseClientOffset: {
+            x,
+            y,
+          },
+        });
+        setDragPaneWrapperState((dragPaneWrapperState) => {
+          return produce(
+            dragPaneWrapperState,
+            (dragPaneWrapperState: DragPaneWrapperState) => {
+              dragPaneWrapperState.isSizeDragging = false;
+              dragPaneWrapperState.activeDragBarDirection = null;
+              dragPaneWrapperState.deltaX = 0;
+              dragPaneWrapperState.deltaY = 0;
+            }
+          );
+        });
+      }
+    },
+    [isSizeDragging]
+  );
   // 绑定事件
   useEventListener('mousemove', resizePanel as any);
-  useEventListener('mouseup', stopResize as EventListener);
+  useEventListener('mouseup', stopResize as any);
   // 获取当前激活框的位置信息
   function getPosition() {
     let position = { left: 0, top: 0 };
-    const layerRect = layer.getBoundingClientRect()
+    const layerRect = layer.getBoundingClientRect();
     return {
       left: position.left,
       top: position.top,
@@ -139,15 +162,15 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
         forceUPdate();
       }, 0);
     });
-    
+
     multationRef.observe(widgetLayer, {
       attributes: true,
       childList: true,
       subtree: true,
-    })
+    });
     return () => {
-      multationRef.disconnect()
-    }
+      multationRef.disconnect();
+    };
   }, []);
   const currentColumnIndex = path[path.length - 2];
   const position = getPosition();

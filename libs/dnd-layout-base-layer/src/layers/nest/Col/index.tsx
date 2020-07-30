@@ -6,18 +6,21 @@ import {
   Action,
   ILayout,
   DragDirection,
-  SizeOptions,
-  ILayoutTheme,
   DropOptions,
   INode,
-  HoverOptions,
-  IAnyLayoutTheme,
-  INestLayoutTheme,
+  SizeOptions,
 } from 'dnd-layout-renderer';
-import { ThemeContext, ISizeContext } from 'dnd-layout-renderer';
-import { toReal } from '../../../utils/calcWidth';
+import { ISizeContext } from 'dnd-layout-renderer';
+import { toReal, toVirtual } from '../../../utils/calcWidth';
 import { calcDirection, HoverDirection } from '../Atom/calcHover';
 import { SizeContext } from '../../../../../dnd-layout-renderer/src/context/sizeContext';
+import {
+  INestLayoutTheme,
+  LayerContext,
+  useLayerContext,
+} from '../../../context/theme';
+import { calcMovePosition } from '../../../utils/calcPosition';
+import { IAnySizeOptions } from '../../../types/layout';
 export const ColType = 'col';
 export function getColNode(w: number, data: ILayout) {
   return {
@@ -28,10 +31,10 @@ export function getColNode(w: number, data: ILayout) {
 }
 class ColAction extends Action {
   onRemove(): INode {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
-  onMove(dragPath: number[], dropPath: number[], options: HoverOptions): void {
-    throw new Error("Method not implemented.");
+  onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
+    throw new Error('Method not implemented.');
   }
   onDrag() {
     if (!this.dispatchOthers('onDrag', ...arguments)) {
@@ -44,7 +47,7 @@ class ColAction extends Action {
     }
   }
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
-    const { dropBoundingRect, clientOffset, data } = options;
+    const { dropBoundingRect, mouseClientOffset: clientOffset, data } = options;
     const direction = calcDirection(dropBoundingRect, clientOffset);
     const node = this.getNode();
     if (
@@ -66,18 +69,22 @@ class ColAction extends Action {
       parentAction.onDrop(dragPath, dropPath, options);
     }
   }
-  onSizeChange(options: SizeOptions) {
-    const { direction, size } = options;
-
+  onSizeChange(path: number[], options: IAnySizeOptions) {
+    const { direction, mouseClientOffset, originMouseClientOffset, layerContext } = options;
+    let { x} = calcMovePosition(
+      originMouseClientOffset,
+      mouseClientOffset
+    );
+    x = toVirtual(x, layerContext.width)
     const node = this.getNode();
     const preSibling = this.getPreviousSibling();
     const nextSibling = this.getNextSibling();
     if (direction === DragDirection.LEFT) {
-      node.w = node.w - size;
-      preSibling.w = preSibling.w + size;
+      node.w = node.w - x;
+      preSibling.w = preSibling.w + x;
     } else {
-      node.w = node.w + size;
-      nextSibling.w = nextSibling.w - size;
+      node.w = node.w + x;
+      nextSibling.w = nextSibling.w - x;
     }
   }
 }
@@ -88,7 +95,7 @@ const Col: IAtom = {
   sizeProcess: (config) => {
     const { layout, size, parent, theme } = config;
     const childCount = parent.children.length;
-    const w = (theme.nest.col.gap * (childCount - 1)) / childCount;
+    const w = (theme.col.gap * (childCount - 1)) / childCount;
     return {
       ...size,
       width: toReal(layout.w, size.width) - w,
@@ -96,7 +103,7 @@ const Col: IAtom = {
   },
   renderer: (props: IAtomRenderer) => {
     const { width } = React.useContext<ISizeContext>(SizeContext);
-    const theme: INestLayoutTheme = React.useContext(ThemeContext) ;
+    const { theme } = useLayerContext<INestLayoutTheme>();
     const style = {
       boxSizing: 'border-box',
       position: 'relative',

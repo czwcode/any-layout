@@ -3,23 +3,26 @@ import PreviewAtom from './preview';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import {
   IAtomRenderer,
-  useLayoutDragAndDop,
   Action,
-  SizeOptions,
   DragDirection,
   DropOptions,
   INode,
-  HoverOptions,
+  SizeContext,
 } from 'dnd-layout-renderer';
 import { calcDirection, HoverDirection } from './calcHover';
 import DirectionOverlap from './DirectionOverlap';
 import ActiveFrame from '../SizePanel/ActiveFrame';
+import { useAnyLayoutDragAndDop } from '../../../hooks/useAnyDragAndDrop';
+import { calcMovePosition } from '../../../utils/calcPosition';
+import { toVirtual } from '../../../utils/calcWidth';
+import { IAnySizeOptions } from '../../../types/layout';
+import { LayerContext } from '../../../context/theme';
 
 class AtomAction extends Action {
   onRemove(): INode {
     throw new Error('Method not implemented.');
   }
-  onMove(dragPath: number[], dropPath: number[], options: HoverOptions): void {
+  onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
   onDrag() {
@@ -34,7 +37,7 @@ class AtomAction extends Action {
     }
   }
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
-    const { clientOffset, dropBoundingRect, data } = options;
+    const { mouseClientOffset: clientOffset, dropBoundingRect, data } = options;
     const direction = calcDirection(dropBoundingRect, clientOffset);
     const node = this.getNode();
     const parent = this.getParent();
@@ -54,9 +57,19 @@ class AtomAction extends Action {
       parentAction.onDrop(dragPath, dropPath, options);
     }
   }
-  onSizeChange(options: SizeOptions) {
-    const { direction, size } = options;
-
+  onSizeChange(path: number[], options: IAnySizeOptions) {
+    const {
+      direction,
+      mouseClientOffset,
+      originMouseClientOffset,
+      layerContext,
+    } = options;
+    const { width } = layerContext;
+    const { x, y } = calcMovePosition(
+      originMouseClientOffset,
+      mouseClientOffset
+    );
+    const size = toVirtual(y, width);
     const node = this.getNode();
     const parent = this.getParent();
     const grandParent = this.getGrandParent();
@@ -71,7 +84,7 @@ class AtomAction extends Action {
       });
       node.h = node.h + size;
     } else {
-      parentAction.onSizeChange(options);
+      parentAction.onSizeChange(path, options);
     }
   }
 }
@@ -92,21 +105,22 @@ const EditContainer = {
     } = props;
     const Renderer = PreviewAtom.renderer;
     const [direction, setDirection] = React.useState<HoverDirection>(null);
-
+    const size = React.useContext(SizeContext);
+    const layerContext = React.useContext(LayerContext);
     // @ts-ignore
     const [
       collectDragProps,
       collectDropProps,
       ref,
       preview,
-    ] = useLayoutDragAndDop<HTMLDivElement>({
+    ] = useAnyLayoutDragAndDop<HTMLDivElement>({
       onDrag,
       data: JSON.parse(JSON.stringify(layout)),
       onDragEnd,
       path,
       onHover: (dragPaht, path, options) => {
         // 组件为加载完成
-        const { clientOffset, dropBoundingRect } = options;
+        const { mouseClientOffset: clientOffset, dropBoundingRect } = options;
         const currentDirection = calcDirection(dropBoundingRect, clientOffset);
         if (direction !== currentDirection) {
           setDirection(currentDirection);
@@ -127,20 +141,6 @@ const EditContainer = {
         }}
       >
         <Renderer {...props}>
-          <ActiveFrame
-            onActive={() => {
-              onActive(path);
-            }}
-            ActiveOperateComponent={() => {
-              return <div></div>;
-            }}
-            activePath={activePath}
-            onSizeChange={(direction, size) => {
-              onSizeChange(path, direction, size);
-            }}
-            layer={layer}
-            path={path}
-          />
           <div
             style={{
               height: '100%',
@@ -151,6 +151,24 @@ const EditContainer = {
               border: '1px solid lightgrey',
             }}
           ></div>
+          <ActiveFrame
+            onActive={() => {
+              onActive(path);
+            }}
+            ActiveOperateComponent={() => {
+              return <div></div>;
+            }}
+            activePath={activePath}
+            onSizeChange={(options) => {
+              onSizeChange(path, {
+                ...options,
+                layerContext: layerContext,
+                size,
+              } as any);
+            }}
+            layer={layer}
+            path={path}
+          />
           <DirectionOverlap direction={collectDropProps.isOver && direction} />
         </Renderer>
       </div>

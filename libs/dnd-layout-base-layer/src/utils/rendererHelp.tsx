@@ -10,6 +10,8 @@ export const defaultAtomRenderer = ({ node, width, height }) => {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-    >{node.id}</div>
+    >
+      {node.id}
+    </div>
   );
-}
+};

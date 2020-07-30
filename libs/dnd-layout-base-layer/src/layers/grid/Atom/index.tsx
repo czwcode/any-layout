@@ -1,20 +1,20 @@
 import React from 'react';
-import PreviewAtom, { getBoundingRect } from './preview';
+import PreviewAtom from './preview';
 import {
   IAtomRenderer,
-  useLayoutDrag,
   LayerType,
   Action,
-  SizeOptions,
-  DragDirection,
   DropOptions,
   INode,
-  ThemeContext,
   ISizeContext,
   SizeContext,
-  IGridLayoutTheme,
+  SizeOptions,
 } from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
+import { LayerContext, IGridLayoutTheme } from '../../../context/theme';
+import { useAnyLayoutDrag } from '../../../hooks/useAnyDrag';
+import { getBoundingRect } from '../Layer/calcUtils';
+import { IAnySizeOptions } from '../../../types/layout';
 
 class AtomAction extends Action {
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
@@ -30,24 +30,9 @@ class AtomAction extends Action {
     const parentAction = this.getParentAction();
     parentAction.onMove(dragPath, dropPath, options);
   }
-  onSizeChange(options: SizeOptions) {
-    const { direction, size } = options;
-
-    const node = this.getNode();
-    switch (direction) {
-      case DragDirection.BOTTOM:
-        node.h = size + node.h;
-        break;
-      case DragDirection.LEFT:
-        node.w = size + node.w;
-        break;
-      case DragDirection.RIGHT:
-        node.w = size + node.w;
-        break;
-
-      default:
-        break;
-    }
+  onSizeChange(path: number[], options: IAnySizeOptions) {
+    const parentAction = this.getParentAction();
+    parentAction.onSizeChange(path, options);
   }
 }
 const EditContainer = {
@@ -64,11 +49,12 @@ const EditContainer = {
       onDragEnd,
       path,
     } = props;
-    const theme: IGridLayoutTheme = React.useContext(ThemeContext);
-    console.log('theme: ', theme);
+    const { theme }: { theme: IGridLayoutTheme } = React.useContext(
+      LayerContext
+    );
     const size = React.useContext<ISizeContext>(SizeContext);
     // @ts-ignore
-    const [collectDragProps, ref] = useLayoutDrag<HTMLDivElement>({
+    const [collectDragProps, ref] = useAnyLayoutDrag<HTMLDivElement>({
       onDrag,
       layerType: LayerType.Absolute,
       data: JSON.parse(JSON.stringify(layout)),
@@ -92,20 +78,6 @@ const EditContainer = {
           style={{ width: '100%', height: '100%', position: 'relative' }}
         >
           <PreviewAtom.renderer {...props}>
-            <ActiveFrame
-              onActive={() => {
-                onActive(path);
-              }}
-              ActiveOperateComponent={() => {
-                return <div></div>;
-              }}
-              activePath={activePath}
-              onSizeChange={(direction, size) => {
-                onSizeChange(path, direction, size);
-              }}
-              layer={layer}
-              path={path}
-            />
             <div
               style={{
                 height: '100%',
@@ -116,6 +88,23 @@ const EditContainer = {
                 border: '1px dashed lightgrey',
               }}
             ></div>
+            <ActiveFrame
+              onActive={() => {
+                onActive(path);
+              }}
+              ActiveOperateComponent={() => {
+                return <div></div>;
+              }}
+              activePath={activePath}
+              onSizeChange={(options) => {
+                onSizeChange(path, {
+                  ...options,
+                  size,
+                });
+              }}
+              layer={layer}
+              path={path}
+            />
           </PreviewAtom.renderer>
         </div>
       </div>

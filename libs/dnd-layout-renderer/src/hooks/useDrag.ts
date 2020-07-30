@@ -1,21 +1,31 @@
 import * as React from 'react';
-import { useDrag, DragElementWrapper, DragSourceOptions, DragPreviewOptions } from 'react-dnd';
+import {
+  useDrag,
+  DragElementWrapper,
+  DragSourceOptions,
+  DragPreviewOptions,
+} from 'react-dnd';
 import { DragDropType, ILayout, LayerType } from '../types';
-export interface IDragConfig<ITheme> {
+export interface IDragConfig {
   onDrag?: (path: number[]) => void;
   onDragEnd?: (path: number[]) => void;
   path?: number[];
-  data?: ILayout<ITheme>;
-  layerType?: LayerType
+  data?: ILayout;
+  layerType?: LayerType;
   dragType?: string;
 }
-export interface DragInfo<ITheme> {
-  type: string
-  path: number[]
-  layerType: LayerType,
-  data: ILayout<ITheme>
+export interface DragInfo {
+  type: string;
+  path: number[];
+  layerType: LayerType;
+  data: ILayout;
 }
-export function useLayoutDrag<T, ITheme>(config: IDragConfig<ITheme>) {
+export function useLayoutDrag<T>(config: IDragConfig): [
+  { isDragging: boolean },
+  React.MutableRefObject<T>,
+  DragElementWrapper<DragSourceOptions>,
+  DragElementWrapper<DragPreviewOptions>
+] {
   const {
     onDrag,
     data,
@@ -30,7 +40,7 @@ export function useLayoutDrag<T, ITheme>(config: IDragConfig<ITheme>) {
       type: dragType,
       path,
       layerType,
-      data: JSON.parse(JSON.stringify(data|| {})),
+      data: JSON.parse(JSON.stringify(data || {})),
     },
     begin: (monitor) => {
       setTimeout(() => {
@@ -48,10 +58,5 @@ export function useLayoutDrag<T, ITheme>(config: IDragConfig<ITheme>) {
     canDrag: () => true,
   });
   drag(dragRef);
-  return [collectionDragProps, dragRef, drag, preview] as [
-    { isDragging: boolean },
-    React.MutableRefObject<T>,
-    DragElementWrapper<DragSourceOptions>,
-    DragElementWrapper<DragPreviewOptions>
-  ];
+  return [collectionDragProps, dragRef, drag, preview];
 }

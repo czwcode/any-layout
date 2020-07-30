@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 import { CSSProperties } from 'styled-components';
 import { NestLayoutType, GridLayoutType } from '../types/componentTypes';
+import React from 'react';
 export interface INestLayoutTheme {
   row: {
     gap: number;
@@ -36,4 +37,13 @@ export const defaultTheme: ILayoutTheme = {
     rowHeight: 30
   },
 };
-export const ThemeContext = createContext<IAnyLayoutTheme>(null);
+export interface ILayerContext<T>  {
+  theme: T
+  width: number
+}
+export const LayerContext = createContext<ILayerContext<IAnyLayoutTheme>>(null);
+export function useLayerContext<T>(): ILayerContext<T> {
+  return React.useContext(LayerContext) as any
+}
+
+export const AnyLayoutTheme = React.createContext<ILayoutTheme>(defaultTheme);

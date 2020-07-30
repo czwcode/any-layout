@@ -3,41 +3,41 @@ import {
   IAtom,
   LayoutType,
   IAtomRenderer,
-  ILayoutTheme,
-  ThemeContext,
   ISizeContext,
   SizeContext,
-  INestLayoutTheme,
 } from 'dnd-layout-renderer';
 import { defaultAtomRenderer } from '../../../utils/rendererHelp';
+import { INestLayoutTheme, LayerContext, useLayerContext } from '../../../context/theme';
 export const AtomType = 'nestAtom';
 
 const Widget: IAtom = {
   layoutType: LayoutType.Atom,
   atomType: AtomType,
   sizeProcess: (config) => {
-    const { layout, size, theme, parent } = config;
-    const childCount = parent.children.length;
-    const h = (theme.atom.gap * (childCount - 1)) / childCount;
+    const { layout, path, size, theme, parent } = config;
+    const lastPath = path[path.length - 1];
     const { width } = size;
     return {
       width: width,
-      height: layout.h - h,
+      height: layout.h - (lastPath === 0 ? 0 : theme.atom.gap),
     };
   },
   renderer: (props: IAtomRenderer) => {
     const {
       layout,
       children,
+      path,
       atomFrameRenderer = defaultAtomRenderer,
     } = props;
-    const { width, height } = React.useContext<ISizeContext>(SizeContext);
-    const theme: INestLayoutTheme = React.useContext(ThemeContext) ;
+    const lastPath = path[path.length - 1];
+    const size = React.useContext<ISizeContext>(SizeContext);
+    const { width, height } = size;
+    const { theme } = useLayerContext<INestLayoutTheme>();
     return (
       <div
         className='nest-atom'
         style={{
-          marginTop: theme.atom.gap,
+          marginTop: lastPath === 0 ? 0 : theme.atom.gap,
           position: 'relative',
           transition: 'all 200ms ease',
           minHeight: height,
@@ -45,7 +45,7 @@ const Widget: IAtom = {
           ...theme.atom.style,
         }}
       >
-        {atomFrameRenderer({ node: layout, width, height })}
+        {atomFrameRenderer({ node: layout, width, height: height })}
         {children}
       </div>
     );

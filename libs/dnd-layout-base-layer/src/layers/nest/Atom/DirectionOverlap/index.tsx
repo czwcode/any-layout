@@ -27,6 +27,7 @@ const StyledDiv = styled.div`
   .drag-column {
     height: 100%;
     width: 100%;
+    top: 0px;
     /* background: red; */
     z-index: 20;
     pointer-events: none;

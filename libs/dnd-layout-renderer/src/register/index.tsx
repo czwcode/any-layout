@@ -1,6 +1,6 @@
 import React from 'react';
-import { ILayout, Action, DragDirection } from '../types';
-import { HoverOptions, DropOptions } from '../hooks/useDrop';
+import { ILayout, Action, DragDirection, LayoutType, SizeOptions } from '../types';
+import {  DropOptions } from '../hooks/useDrop';
 import { IAtomFrameRenderer } from '../renderCore/Travse';
 
 export interface IInteractive {
@@ -12,17 +12,16 @@ export interface IInteractive {
   onMove: (
     dragPath: number[],
     hoverPath: number[],
-    options: HoverOptions
+    options: DropOptions
   ) => void;
   onSizeChange: (
     path: number[],
-    direction: DragDirection,
-    size: number
+    sizeOptions: SizeOptions,
   ) => void;
 }
 
-export interface IAtomRenderer<ITheme> extends IInteractive {
-  layout: ILayout<ITheme>;
+export interface IAtomRenderer extends IInteractive {
+  layout: ILayout;
   path: number[];
   style?: React.CSSProperties;
   atomFrameRenderer: (props: IAtomFrameRenderer) => React.ReactNode;
@@ -30,26 +29,27 @@ export interface IAtomRenderer<ITheme> extends IInteractive {
   layer?: HTMLDivElement;
   activePath: number[];
 }
-export interface IAtom<ITheme> {
-  layoutType: string;
+export interface IAtom {
+  layoutType: LayoutType;
   atomType: string;
   action?: typeof Action;
-  sizeProcess?: (config: ISizeProcess<ITheme>) => ISize;
-  renderer: React.ComponentClass<IAtomRenderer<ITheme>> | React.FC<IAtomRenderer<ITheme>>;
+  sizeProcess?: (config: ISizeProcess) => ISize;
+  renderer: React.ComponentClass<IAtomRenderer> | React.FC<IAtomRenderer>;
 }
 
 export interface ISize {
   width?: number;
   height?: number;
 }
-export interface ISizeProcess<ITheme> {
-  layout: ILayout<ITheme>;
-  parent: ILayout<ITheme>;
+export interface ISizeProcess {
+  layout: ILayout;
+  parent: ILayout;
+  path: number[]
   size: ISize;
-  theme: ITheme;
+  theme: any;
 }
 const __ATOMS__ = {} as {
-  [key: string]: IAtom<any>;
+  [key: string]: IAtom;
 };
 
 /**
@@ -58,7 +58,7 @@ const __ATOMS__ = {} as {
  * @export
  * @param {IAtom} atom
  */
-export function regist<ITheme>(atom: IAtom<ITheme>) {
+export function regist(atom: IAtom) {
   const atomType = atom.atomType;
   __ATOMS__[atomType] = atom;
 }

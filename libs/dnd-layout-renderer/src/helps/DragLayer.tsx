@@ -18,7 +18,7 @@ function getItemStyles(props: ItemStyleProps) {
   if (!initialOffset || !clientOffset) {
     return null;
   }
-  let { x,  y } = clientOffset;
+  let { x, y } = clientOffset;
   x -= initialOffset.x;
   y -= initialOffset.y;
   x += initialOffset.x;
@@ -34,20 +34,22 @@ export interface ItemStyleProps {
   clientOffset: XYCoord;
 }
 
-export interface IDragLayerFrameRenderer<ITheme> {
-  node: INode<ITheme>;
+export interface IDragLayerFrameRenderer {
+  node: INode;
   layerType: LayerType;
   type: string;
 }
-export interface CustomDragLayerProps<ITheme> {
+export interface CustomDragLayerProps {
   layerRef: HTMLDivElement | null;
-  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer<ITheme>) => React.ReactNode;
+  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode;
   isDragging: boolean;
-  item: DragInfo<ITheme>;
+  item: DragInfo;
 }
 let dragPreviewRef: HTMLDivElement = null;
 let subscribedToOffsetChange = false;
-const CustomDragLayer = <ITheme extends Object>(props: CustomDragLayerProps<ITheme>) => {
+const CustomDragLayer =(
+  props: CustomDragLayerProps
+) => {
   const { transform } = useDragLayer((monitor) => {
     const transform = getItemStyles({
       initialOffset: monitor.getInitialSourceClientOffset(),
@@ -63,7 +65,13 @@ const CustomDragLayer = <ITheme extends Object>(props: CustomDragLayerProps<IThe
     item,
     dragLayerFrameRenderer = (props) => {
       return (
-        <>{props.layerType === LayerType.Nest && <div style={{ height: 40, width: 80, background: 'lightgreen' }}></div>}</>
+        <>
+          {props.layerType === LayerType.Nest && (
+            <div
+              style={{ height: 40, width: 80, background: 'lightgreen' }}
+            ></div>
+          )}
+        </>
       );
     },
   } = props;
@@ -98,13 +106,13 @@ const onOffsetChange = (monitor: DragLayerMonitor) => () => {
   dragPreviewRef.style['-webkit-transform' as any] = transform;
 };
 
-export default DragLayer(<ITheme extends Object>(monitor) => {
+export default DragLayer((monitor) => {
   if (!subscribedToOffsetChange) {
     (monitor as any).subscribeToOffsetChange(onOffsetChange(monitor));
     subscribedToOffsetChange = true;
   }
   return {
-    item: monitor.getItem() as DragInfo<ITheme>,
+    item: monitor.getItem() as DragInfo,
     itemType: monitor.getItemType(),
     isDragging: monitor.isDragging(),
   };

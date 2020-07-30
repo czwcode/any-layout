@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { RenderCore, DragFrame, ILayoutTheme, ILayout } from 'dnd-layout';
+import { RenderCore, DragFrame, ILayout, AnyLayout } from 'dnd-layout';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import uuid from 'uuid'
-import { produce} from 'immer'
+import uuid from 'uuid';
+import { produce } from 'immer';
 export default {
   title: 'demos/嵌套布局',
   component: RenderCore,
@@ -15,7 +15,7 @@ export default {
 export const 自定义拖拽展示 = () => {
   return (
     <DndProvider backend={HTML5Backend}>
-      <RenderCore
+      <AnyLayout
         onLayoutChange={() => {}}
         dragLayerFrameRenderer={() => {
           return <div>自定义拖拽</div>;
@@ -30,30 +30,36 @@ export const 自定义拖拽展示 = () => {
                 id: '22',
                 children: [
                   {
-                    type: 'row',
-                    id: '33',
+                    type: 'nestLayer',
+                    id: '2222',
                     children: [
                       {
-                        id: '44',
-                        type: 'col',
-                        w: 12,
+                        type: 'row',
+                        id: '33',
                         children: [
                           {
-                            id: '4444',
-                            type: 'nestAtom',
-                            h: 300,
+                            id: '44',
+                            type: 'col',
+                            w: 12,
+                            children: [
+                              {
+                                id: '4444',
+                                type: 'nestAtom',
+                                h: 300,
+                              },
+                            ],
                           },
-                        ],
-                      },
-                      {
-                        id: '55',
-                        type: 'col',
-                        w: 12,
-                        children: [
                           {
-                            id: '555',
-                            type: 'nestAtom',
-                            h: 300,
+                            id: '55',
+                            type: 'col',
+                            w: 12,
+                            children: [
+                              {
+                                id: '555',
+                                type: 'nestAtom',
+                                h: 300,
+                              },
+                            ],
                           },
                         ],
                       },
@@ -77,37 +83,42 @@ function createLayout() {
         {
           type: 'containerPanel',
           id: '22',
-          children: generateLayouts(),
+          children: [
+            {
+              type: 'nestLayer',
+              id: '33',
+              children: generateLayouts(),
+            },
+          ],
         },
       ],
     },
-  ]
-  return layout
+  ];
+  return layout;
 }
 function getColor() {
   const r = Math.random() * 255;
   const g = Math.random() * 255;
   const b = Math.random() * 255;
-  return `rgb(${r}, ${g}, ${b})`
-  
+  return `rgb(${r}, ${g}, ${b})`;
 }
-const rowNums = 4
-function generateAtoms(nums){
-  const height = 500
-  const middle=  height /nums
-  let atoms = []
-  let sum = 0
-  for(let index = 0; index< nums - 1; index++) {
-    const currentH = Math.ceil(Math.random() * middle / 2) + middle / 2
-    sum += currentH
+const rowNums = 4;
+function generateAtoms(nums) {
+  const height = 500;
+  const middle = height / nums;
+  let atoms = [];
+  let sum = 0;
+  for (let index = 0; index < nums - 1; index++) {
+    const currentH = Math.ceil((Math.random() * middle) / 2) + middle / 2;
+    sum += currentH;
     atoms.push({
       id: uuid(),
       type: 'nestAtom',
       h: currentH,
       state: {
-        background: getColor()
-      }
-    })
+        background: getColor(),
+      },
+    });
   }
 
   atoms.push({
@@ -115,66 +126,77 @@ function generateAtoms(nums){
     type: 'nestAtom',
     h: height - sum,
     state: {
-      background: getColor()
-    }
-  })
-  return atoms
+      background: getColor(),
+    },
+  });
+  return atoms;
 }
 function generateCols() {
-  let rows = []
-  for(let index = 0; index < 4; index++) {
-    let row = []
-    const w1= Math.ceil(Math.random() * 5) + 5
-    const w2= Math.ceil(Math.random() * 5) + 5
-    row.push({
-      id: uuid(),
-      type: 'col',
-      w: w1,
-      children:  generateAtoms(Math.ceil(Math.random() * 3) + 1 )
-    })
-    row.push({
-      id: uuid(),
-      type: 'col',
-      w: w2,
-      children:  generateAtoms(Math.ceil(Math.random() * 3) + 1 )
-    })
-    rows.push({
-      id: uuid(),
-      type: 'col',
-      w: 24- w1-w2,
-      children:  generateAtoms(Math.ceil(Math.random() * 3) + 1 )
-    })
-  }
-  return rows
+  let cols = [];
+  const w1 = Math.ceil(Math.random() * 5) + 5;
+  const w2 = Math.ceil(Math.random() * 5) + 5;
+  cols.push({
+    id: uuid(),
+    type: 'col',
+    w: w1,
+    children: generateAtoms(Math.ceil(Math.random() * 3) + 1),
+  });
+  cols.push({
+    id: uuid(),
+    type: 'col',
+    w: w2,
+    children: generateAtoms(Math.ceil(Math.random() * 3) + 1),
+  });
+  cols.push({
+    id: uuid(),
+    type: 'col',
+    w: 24 - w1 - w2,
+    children: generateAtoms(Math.ceil(Math.random() * 3) + 1),
+  });
+  return cols;
 }
 
-function generateLayouts(){
-  let rowItems = []
-  for(let i = 0; i < rowNums; i++) {
-    rowItems.push( {
+function generateLayouts() {
+  let rowItems = [];
+  for (let i = 0; i < rowNums; i++) {
+    const cols = generateCols();
+    rowItems.push({
       type: 'row',
       id: uuid(),
-      children: generateCols()
-    })
+      children: cols,
+    });
   }
- return rowItems
+  return rowItems;
 }
 
 export const Atom自定义渲染 = () => {
-  
-  const [layout, setLayout] = useState(createLayout())
-  
+  const createL = createLayout();
+  console.log('createL: ', createL);
+  const [layout, setLayout] = useState(createL);
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <button onClick={() => {
-        setLayout(createLayout())
-      }}>重新生成布局</button>
-      <RenderCore
+      <button
+        onClick={() => {
+          const l = createLayout();
+          console.log('createL: ', l);
+          setLayout(l);
+        }}
+      >
+        重新生成布局
+      </button>
+      <AnyLayout
         atomFrameRenderer={(props) => {
           const { width, height, node } = props;
-          console.log(node.state)
+          console.log(node.state);
           return (
-            <div style={{ width, height, background: node.state && node.state.background }}>
+            <div
+              style={{
+                width,
+                height,
+                background: node.state && node.state.background,
+              }}
+            >
               111
             </div>
           );
@@ -199,7 +221,7 @@ export const 外部拖入 = () => {
           外部组件
         </div>
       </DragFrame>
-      <RenderCore
+      <AnyLayout
         onLayoutChange={(layout) => {
           console.log('layout', layout);
         }}
@@ -214,7 +236,19 @@ export const 外部拖入 = () => {
               {
                 type: 'containerPanel',
                 id: '22',
-                children: [],
+                children: [
+                  {
+                    type: 'containerPanel',
+                    id: '222',
+                    children: [
+                      {
+                        type: 'nestLayer',
+                        id: '2222',
+                        children: [],
+                      },
+                    ],
+                  },
+                ],
               },
             ],
           },
@@ -235,33 +269,39 @@ export const 外部修改atom状态 = () => {
           id: '22',
           children: [
             {
-              type: 'row',
-              id: '33',
+              type: 'nestLayer',
+              id: '222',
               children: [
                 {
-                  id: '44',
-                  type: 'col',
-                  w: 12,
+                  type: 'row',
+                  id: '33',
                   children: [
                     {
-                      id: '444',
-                      type: 'nestAtom',
-                      h: 300,
-                      state: {
-                        a: 1,
-                      },
+                      id: '44',
+                      type: 'col',
+                      w: 12,
+                      children: [
+                        {
+                          id: '444',
+                          type: 'nestAtom',
+                          h: 300,
+                          state: {
+                            a: 1,
+                          },
+                        },
+                      ],
                     },
-                  ],
-                },
-                {
-                  id: '55',
-                  type: 'col',
-                  w: 12,
-                  children: [
                     {
-                      id: '555',
-                      type: 'nestAtom',
-                      h: 300,
+                      id: '55',
+                      type: 'col',
+                      w: 12,
+                      children: [
+                        {
+                          id: '555',
+                          type: 'nestAtom',
+                          h: 300,
+                        },
+                      ],
                     },
                   ],
                 },
@@ -271,19 +311,23 @@ export const 外部修改atom状态 = () => {
         },
       ],
     },
-  ])
+  ]);
   return (
     <div>
-      <button onClick={() => {
-        const newLayout = produce(layout, (layout) => {
-          layout[0].children[0].children[0].children[0].children[0].state.a ++ 
-        })
-        setLayout(newLayout)
-      }}>修改atom的状态</button>
+      <button
+        onClick={() => {
+          const newLayout = produce(layout, (layout) => {
+            layout[0].children[0].children[0].children[0].children[0].children[0].state.a++;
+          });
+          setLayout(newLayout);
+        }}
+      >
+        修改atom的状态
+      </button>
       <DndProvider backend={HTML5Backend}>
-        <RenderCore
+        <AnyLayout
           onLayoutChange={(layout) => {
-            setLayout(layout)
+            setLayout(layout);
           }}
           atomFrameRenderer={(props) => {
             const { node } = props;

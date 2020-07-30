@@ -4,27 +4,25 @@ import { DragDropType, ILayout } from '../types';
 import { DragInfo } from './useDrag';
 import { ISize } from '../register';
 import { SizeContext } from '../context';
-import { ThemeContext, getThemeContext } from '../context/theme';
-export interface HoverOptions<ITheme> {
-  clientOffset: XYCoord;
+export interface BaseDndOptions {
+  mouseClientOffset: XYCoord;
+  originMouseClientOffset: XYCoord;
+  size: ISize;
+}
+export interface DropOptions extends BaseDndOptions {
+  data: ILayout;
   dropBoundingRect: DOMRect;
-  movePosition: XYCoord;
-  theme: ITheme
-  size: ISize
 }
-export interface DropOptions<ITheme> extends HoverOptions<ITheme> {
-  data: ILayout<ITheme>;
-}
-export interface IDropConfig<ITheme> {
+export interface IDropConfig<T extends DropOptions> {
   onDrop: (
     dragPath: number[],
     dropPath: number[],
-    options: DropOptions<ITheme>
+    options: T
   ) => void;
   onHover?: (
     dragPath: number[],
     hoverPath: number[],
-    options: DropOptions<ITheme>
+    options: T
   ) => void;
   /**
    * 当前组件的路径，
@@ -39,26 +37,24 @@ export interface IDropReturnInfo {
   isOver: boolean;
   canDrop: boolean;
 }
-export const useLayoutDrop = <T extends HTMLElement, ITheme>(config: IDropConfig<ITheme>) => {
+export const useLayoutDrop = <T extends HTMLElement>(
+  config: IDropConfig<DropOptions>
+) => {
   const ref = React.useRef<T>(null);
   const { onHover, path, accept = DragDropType.Widget, onDrop } = config;
   const positionInfo = React.useRef(null);
-  const theme = React.useContext(getThemeContext<ITheme>())
-  const size = React.useContext(SizeContext)
+  const size = React.useContext(SizeContext);
   const [collectionDropProps, drop] = useDrop<DragInfo, null, IDropReturnInfo>({
     accept: accept,
     drop: (item, monitor) => {
       const clientOffset = monitor.getClientOffset();
       onDrop(item.path, path, {
-        clientOffset,
-        theme,
+        mouseClientOffset: clientOffset,
         size,
         dropBoundingRect: ref.current.getBoundingClientRect(),
-        movePosition: {
-          x:
-            (clientOffset.x - positionInfo.current.originMouseX),
-          y:
-            (clientOffset.y - positionInfo.current.originMouseY),
+        originMouseClientOffset: {
+          x: positionInfo.current.originMouseX,
+          y: positionInfo.current.originMouseY,
         },
         data: JSON.parse(JSON.stringify(item.data)),
       });
@@ -89,13 +85,12 @@ export const useLayoutDrop = <T extends HTMLElement, ITheme>(config: IDropConfig
       onHover &&
         onHover(item.path, path, {
           data: JSON.parse(JSON.stringify(item.data)),
-          theme: theme,
           size,
-          clientOffset,
+          mouseClientOffset: clientOffset,
           dropBoundingRect: ref.current.getBoundingClientRect(),
-          movePosition: {
-            x: clientOffset.x - positionInfo.current.originMouseX,
-            y: clientOffset.y - positionInfo.current.originMouseY,
+          originMouseClientOffset: {
+            x: positionInfo.current.originMouseX,
+            y: positionInfo.current.originMouseY,
           },
         });
     },

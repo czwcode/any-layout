@@ -1,6 +1,6 @@
 import { INode, ILayout } from './layout';
 import { getRegist } from '../register';
-import { HoverOptions, DropOptions } from '../hooks/useDrop';
+import {  DropOptions, BaseDndOptions } from '../hooks/useDrop';
 import TreeSolver from '../interactiveCore/TreeSolver';
 
 export interface Position {
@@ -15,12 +15,11 @@ export enum DragDirection {
   TOP = 'top',
 }
 
-export interface SizeOptions {
+export interface SizeOptions extends BaseDndOptions {
   direction: DragDirection;
-  size: number;
 }
 
-export interface BaseAction<ITheme> {
+export interface BaseAction {
   /**
    * 拖拽开始的事件回调
    *
@@ -36,20 +35,20 @@ export interface BaseAction<ITheme> {
    * @param {DropOptions} options 其他信息，包含拖拽落下时元素的位置等信息
    * @memberof BaseAction
    */
-  onDrop(dragPath: number[], dropPath: number[], options: DropOptions<ITheme>): void;
+  onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void;
 
-  onMove(dragPath: number[], dropPath: number[], options: HoverOptions<ITheme>): void;
+  onMove(dragPath: number[], dropPath: number[], options: DropOptions): void;
 
-  onSizeChange(sizeOptions: SizeOptions): void;
+  onSizeChange(path: number[], sizeOptions: SizeOptions): void;
 }
-export interface IAction<ITheme> {
+export interface IAction {
   /**
    *当前Action触发的节点信息
    *
    * @type {ILayout}
    * @memberof Action
    */
-  node: ILayout<ITheme>;
+  node: ILayout;
   /**
    *当前节点路径
    *
@@ -63,12 +62,12 @@ export interface IAction<ITheme> {
    * @type {TreeSolver}
    * @memberof Action
    */
-  core: TreeSolver<ITheme>;
+  core: TreeSolver;
 }
-export abstract class Action<ITheme> implements BaseAction<ITheme>, IAction<ITheme> {
-  node: ILayout<ITheme>;
+export abstract class Action implements BaseAction, IAction {
+  node: ILayout;
   path: number[];
-  core: TreeSolver<ITheme>;
+  core: TreeSolver;
   /**
    * 当前节点在父节点中的位置
    *
@@ -77,7 +76,7 @@ export abstract class Action<ITheme> implements BaseAction<ITheme>, IAction<IThe
    */
   index: number;
 
-  constructor(params: IAction<ITheme>) {
+  constructor(params: IAction) {
     Object.keys(params).forEach((key) => {
       this[key] = params[key];
     });
@@ -153,7 +152,7 @@ export abstract class Action<ITheme> implements BaseAction<ITheme>, IAction<IThe
    * @returns
    * @memberof Action
    */
-  dispatchOthers(type: keyof BaseAction<ITheme>, ...args) {
+  dispatchOthers(type: keyof BaseAction, ...args) {
     const parent = this.getParent();
     const parentChildrenCount = parent.children.length;
     // 交互规则，如果上层节点仅有一个，触发上层节点的onRemove方法
@@ -211,7 +210,7 @@ export abstract class Action<ITheme> implements BaseAction<ITheme>, IAction<IThe
    * @param {ILayout} data
    * @memberof Action
    */
-  insertAfter(data: ILayout<ITheme>) {
+  insertAfter(data: ILayout) {
     this.core.insertAfter(this.path, data);
   }
 
@@ -221,7 +220,7 @@ export abstract class Action<ITheme> implements BaseAction<ITheme>, IAction<IThe
    * @param {ILayout} data
    * @memberof Action
    */
-  insertBefore(data: ILayout<ITheme>) {
+  insertBefore(data: ILayout) {
     this.core.insertBefore(this.path, data);
   }
 
@@ -229,39 +228,39 @@ export abstract class Action<ITheme> implements BaseAction<ITheme>, IAction<IThe
   abstract onDrop(
     dragPath: number[],
     dropPath: number[],
-    options: DropOptions<ITheme>
+    options: DropOptions
   ): void;
-  abstract onRemove(): INode<ITheme>;
+  abstract onRemove(): INode;
   abstract onMove(
     dragPath: number[],
     dropPath: number[],
-    options: HoverOptions<ITheme>
+    options: DropOptions
   ): void;
-  abstract onSizeChange(options: SizeOptions): void;
+  abstract onSizeChange(path: number[], options: SizeOptions): void;
 }
 
 export function getAction(type: string) {
   return getRegist()[type].action;
 }
 
-class ActionInstance<ITheme> extends Action<ITheme> {
+class ActionInstance extends Action {
   onDrag(): void {
     throw new Error('Method not implemented.');
   }
-  onDrop(dragPath: number[], dropPath: number[], options: DropOptions<ITheme>): void {
+  onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
-  onRemove(): INode<ITheme> {
+  onRemove(): INode {
     throw new Error('Method not implemented.');
   }
-  onMove(dragPath: number[], dropPath: number[], options: HoverOptions<ITheme>): void {
+  onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
-  onSizeChange(options: SizeOptions): void {
+  onSizeChange(dragPath: number[], options: SizeOptions): void {
     throw new Error('Method not implemented.');
   }
 }
-export function getActionInstance<ITheme>(params: IAction<ITheme>) {
+export function getActionInstance(params: IAction) {
   const Action = getAction(params.node.type) as typeof ActionInstance;
   const actionInstance = new Action(params);
   return actionInstance;

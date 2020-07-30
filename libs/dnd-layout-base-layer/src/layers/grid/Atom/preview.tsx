@@ -3,16 +3,11 @@ import {
   IAtom,
   LayoutType,
   IAtomRenderer,
-  ILayoutTheme,
-  ThemeContext,
-  ISize,
-  INode,
-  IGridLayoutTheme,
-  INestLayoutTheme,
   SizeContext,
 } from 'dnd-layout-renderer';
-import { calcGridItemPosition } from '../../../utils/calcWidth';
 import { defaultAtomRenderer } from '../../../utils/rendererHelp';
+import { IGridLayoutTheme, useLayerContext } from '../../../context/theme';
+import { getBoundingRect } from '../Layer/calcUtils';
 export const AtomType = 'gridAtom';
 
 const Widget: IAtom = {
@@ -20,7 +15,7 @@ const Widget: IAtom = {
   atomType: AtomType,
   renderer: (props: IAtomRenderer) => {
     const { layout, atomFrameRenderer = defaultAtomRenderer } = props;
-    const theme: IGridLayoutTheme = React.useContext(ThemeContext);
+    const { theme }  = useLayerContext<IGridLayoutTheme>();
     const size= React.useContext(SizeContext);
     const { width, height } = getBoundingRect(theme, size, layout);
     return (
@@ -41,17 +36,3 @@ const Widget: IAtom = {
   },
 };
 export default Widget;
-
-export function getPositionParams(theme: IGridLayoutTheme, width: number) {
-  const { gapX, gapY, rowHeight } = theme;
-  return {
-    containerPadding: [0, 0] as [number, number],
-    margin: [gapX, gapY] as [number, number],
-    rowHeight: rowHeight,
-    containerWidth: width,
-  };
-}
-export function getBoundingRect(theme: IGridLayoutTheme, size: ISize, node: INode) {
-  const { x, y, w, h } = node;
-  return calcGridItemPosition(getPositionParams(theme, size.width), x, y, w, h);
-}

@@ -1,20 +1,15 @@
 import React, { memo } from 'react';
 import { ILayout } from '../types/layout';
 import { IAtomRenderer } from '../register';
-function Wrapper({
-  children,
-}: {
-  layout: ILayout<any>;
-  children: React.ReactNode;
-}) {
+function Wrapper({ children }: { layout: ILayout; children: React.ReactNode }) {
   return <>{children}</>;
 }
 let MemoWrapper = null;
-export function getMemoWrapper<ITheme>() {
+export function getMemoWrapper() {
   if (!MemoWrapper) {
     MemoWrapper = memo<
-      IAtomRenderer<ITheme> & {
-        layout: ILayout<any>;
+      IAtomRenderer & {
+        layout: ILayout;
         children: React.ReactNode;
       }
     >(Wrapper, (preProps, nextProps) => {
@@ -26,8 +21,8 @@ export function getMemoWrapper<ITheme>() {
     });
   }
   return MemoWrapper as React.ComponentClass<
-    IAtomRenderer<ITheme> & {
-      layout: ILayout<any>;
+    IAtomRenderer & {
+      layout: ILayout;
       children: React.ReactNode;
     }
   >;

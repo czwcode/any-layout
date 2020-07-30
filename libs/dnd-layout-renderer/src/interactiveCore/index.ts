@@ -1,35 +1,31 @@
-import {
-  ILayout,
-  SizeOptions,
-  getActionInstance,
-} from '../types';
+import { ILayout, DragDirection, getActionInstance, SizeOptions } from '../types';
 import TreeSolver from './TreeSolver';
 import { produce } from 'immer';
-import { HoverOptions, DropOptions } from '../hooks';
+import {  DropOptions } from '../hooks';
 
-export default class InteractiveCore<ITheme> {
+export default class InteractiveCore {
   /**
    *记录的移除节点的信息
    *
    * @type {ILayout}
    * @memberof InteractiveCore
    */
-  remove?: ILayout<ITheme>;
+  remove?: ILayout;
   /**
    * 缓存布局信息
    *
    * @type {ILayout}
    * @memberof InteractiveCore
    */
-  memeroyLayout: ILayout<ITheme>[];
+  memeroyLayout: ILayout[];
   /**
    *布局核心代码
    *
    * @type {TreeSolver}
    * @memberof InteractiveCore
    */
-  treeCore: TreeSolver<ITheme>;
-  constructor(layout: ILayout<ITheme>[]) {
+  treeCore: TreeSolver;
+  constructor(layout: ILayout[]) {
     this.update(layout);
   }
   get() {
@@ -44,10 +40,10 @@ export default class InteractiveCore<ITheme> {
   clearRemoveNode() {
     this.treeCore.recordRemoveNode = null;
   }
-  update(layout: ILayout<ITheme>[]) {
+  update(layout: ILayout[]) {
     this.treeCore = new TreeSolver(layout);
   }
-  updateCore(core: TreeSolver<ITheme>) {
+  updateCore(core: TreeSolver) {
     this.treeCore = core;
   }
   /**
@@ -56,13 +52,13 @@ export default class InteractiveCore<ITheme> {
    * @memberof InteractiveCore
    */
   onSizeChange(path: number[], options: SizeOptions) {
-    const newCore = produce<TreeSolver<ITheme>>(this.treeCore, (core: any) => {
+    const newCore = produce<TreeSolver>(this.treeCore, (core: any) => {
       const node = core.getNode(path);
-      getActionInstance<ITheme>({
+      getActionInstance({
         node,
         path,
         core,
-      }).onSizeChange(options);
+      }).onSizeChange(path, options);
     });
     this.updateCore(newCore);
   }
@@ -80,7 +76,7 @@ export default class InteractiveCore<ITheme> {
     });
     this.updateCore(newCore);
   }
-  onDrop(dragPath: number[], path: number[], options: DropOptions<ITheme>) {
+  onDrop(dragPath: number[], path: number[], options: DropOptions) {
     const newCore = produce(this.treeCore, (core: any) => {
       const node = core.getNode(path);
       getActionInstance({
@@ -92,7 +88,7 @@ export default class InteractiveCore<ITheme> {
     });
     this.updateCore(newCore);
   }
-  onDropRow(path: number[], dropNode: ILayout<ITheme>) {
+  onDropRow(path: number[], dropNode: ILayout) {
     const newCore = produce(this.treeCore, (core) => {
       const node = core.getNode(path);
       // TODO: 自己实现
@@ -100,7 +96,7 @@ export default class InteractiveCore<ITheme> {
     });
     this.updateCore(newCore);
   }
-  onMove(dragPath: number[], dropPath: number[], options: HoverOptions<ITheme>) {
+  onMove(dragPath: number[], dropPath: number[], options: DropOptions) {
     const newCore = produce(this.treeCore, (core: any) => {
       const node = core.getNode(dropPath);
       getActionInstance({

@@ -7,13 +7,17 @@ import {
   ILayout,
   DropOptions,
   INode,
-  HoverOptions,
+  DragDirection,
   SizeOptions,
-  INestLayoutTheme,
 } from 'dnd-layout-renderer';
 import { getColNode } from '../Col';
-import { ThemeContext } from 'dnd-layout-renderer';
 import { calcDirection, HoverDirection } from '../Atom/calcHover';
+import {
+  INestLayoutTheme,
+  LayerContext,
+  useLayerContext,
+} from '../../../context/theme';
+import { IAnySizeOptions } from '../../../types/layout';
 export const RowType = 'row';
 export function getRowNode(data: ILayout) {
   return {
@@ -23,13 +27,13 @@ export function getRowNode(data: ILayout) {
 }
 class RowAction extends Action {
   onRemove(): INode {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
-  onMove(dragPath: number[], dropPath: number[], options: HoverOptions): void {
-    throw new Error("Method not implemented.");
+  onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
+    throw new Error('Method not implemented.');
   }
-  onSizeChange(options: SizeOptions): void {
-    throw new Error("Method not implemented.");
+  onSizeChange(path: number[], options: IAnySizeOptions): void {
+    throw new Error('Method not implemented.');
   }
   onDrag() {
     if (!this.dispatchOthers('onDrag', ...arguments)) {
@@ -38,9 +42,9 @@ class RowAction extends Action {
     }
   }
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
-    const { dropBoundingRect, clientOffset} = options
-    const direction =calcDirection(dropBoundingRect, clientOffset)
-    const { data } = options
+    const { dropBoundingRect, mouseClientOffset: clientOffset } = options;
+    const direction = calcDirection(dropBoundingRect, clientOffset);
+    const { data } = options;
     if (
       direction === HoverDirection.TOP_OUT ||
       direction === HoverDirection.BOTTOM_OUT
@@ -62,7 +66,7 @@ const Row: IAtom = {
   atomType: RowType,
   action: RowAction,
   renderer: (props: IAtomRenderer) => {
-    const theme: INestLayoutTheme = React.useContext(ThemeContext) ;
+    const { theme } = useLayerContext<INestLayoutTheme>();
     return (
       <div
         className='row'
