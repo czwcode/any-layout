@@ -1,19 +1,18 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
-  SizeContext,
+  IComponentRender,
   PlaceHolder,
   Action,
-  DragDirection,
   DropOptions,
   INode,
-  SizeOptions,
 } from 'dnd-layout-renderer';
 import { NestLayoutType } from '../../../types/componentTypes';
 import { getRowNode } from '../Row';
 import { IAnySizeOptions } from '../../../types/layout';
+import { INestLayoutTheme } from '../../../context/layerContext';
+import { useGlobalContext } from '../../../context/GlobalContext';
 export const AbsoluteLayerType = 'absoluteLayer';
 
 class LayerAction extends Action {
@@ -26,7 +25,7 @@ class LayerAction extends Action {
   onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
-  onSizeChange(path: number[], options: IAnySizeOptions): void {
+  onSizeChange(path: number[], options: IAnySizeOptions<INestLayoutTheme>): void {
     throw new Error('Method not implemented.');
   }
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
@@ -34,12 +33,14 @@ class LayerAction extends Action {
     currentNode.children.push(getRowNode(options.data));
   }
 }
-const Row: IAtom = {
+const Row: IComponent = {
   layoutType: LayoutType.Layer,
   action: LayerAction,
   atomType: NestLayoutType.Layer,
-  renderer: (props: IAtomRenderer) => {
-    const { layout, path, onDrop } = props;
+  renderer: (props: IComponentRender) => {
+    const { interact }  = useGlobalContext<INestLayoutTheme>()
+    const { onDrop} = interact
+    const { layout, path } = props;
     return (
       <div
         className='nest-layer'

@@ -41,7 +41,7 @@ export interface IDragLayerFrameRenderer {
 }
 export interface CustomDragLayerProps {
   layerRef: HTMLDivElement | null;
-  dragLayerFrameRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode;
+  DragBoxRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode;
   isDragging: boolean;
   item: DragInfo;
 }
@@ -63,7 +63,7 @@ const CustomDragLayer =(
   const {
     isDragging,
     item,
-    dragLayerFrameRenderer = (props) => {
+    DragBoxRenderer: dragLayerFrameRenderer = (props) => {
       return (
         <>
           {props.layerType === LayerType.Nest && (

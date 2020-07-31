@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
+  IComponentRender,
   Action,
   ILayout,
   DropOptions,
   INode,
   DragDirection,
-  SizeOptions,
+  ISizeOptions,
 } from 'dnd-layout-renderer';
 import { getColNode } from '../Col';
 import { calcDirection, HoverDirection } from '../Atom/calcHover';
@@ -16,7 +16,7 @@ import {
   INestLayoutTheme,
   LayerContext,
   useLayerContext,
-} from '../../../context/theme';
+} from '../../../context/layerContext';
 import { IAnySizeOptions } from '../../../types/layout';
 export const RowType = 'row';
 export function getRowNode(data: ILayout) {
@@ -32,7 +32,10 @@ class RowAction extends Action {
   onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
-  onSizeChange(path: number[], options: IAnySizeOptions): void {
+  onSizeChange(
+    path: number[],
+    options: IAnySizeOptions<INestLayoutTheme>
+  ): void {
     throw new Error('Method not implemented.');
   }
   onDrag() {
@@ -61,11 +64,11 @@ class RowAction extends Action {
     }
   }
 }
-const Row: IAtom = {
+const Row: IComponent = {
   layoutType: LayoutType.Layout,
   atomType: RowType,
   action: RowAction,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     const { theme } = useLayerContext<INestLayoutTheme>();
     return (
       <div

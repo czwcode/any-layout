@@ -1,13 +1,13 @@
 import React from 'react';
 import PreviewContiner from './preview';
-import { IAtomRenderer } from 'dnd-layout-renderer';
+import { IComponentRender } from 'dnd-layout-renderer';
 
 const EditContainer = {
   ...PreviewContiner,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     const Renderer = PreviewContiner.renderer;
     return (
-      <div style={{  boxSizing: 'border-box'}}>
+      <div style={{ boxSizing: 'border-box' }}>
         <Renderer {...props} />
       </div>
     );

@@ -1,21 +1,24 @@
 import React from 'react';
 import PreviewAtom from './preview';
 import {
-  IAtomRenderer,
+  IComponentRender,
   LayerType,
   Action,
   INode,
   DropOptions,
   SizeContext,
   DragDirection,
-  SizeOptions,
+  ISizeOptions,
 } from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
 import { toReal } from '../../../utils/calcWidth';
 import { useAnyLayoutDrag } from '../../../hooks/useAnyDrag';
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { IAnySizeOptions } from '../../../types/layout';
-class AtomAction extends Action {
+import { useGlobalContext } from '../../../context/GlobalContext';
+import { useLayerContext } from '../../../context/layerContext';
+import { AnyAction } from '../../../actions';
+class AtomAction extends AnyAction<any> {
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
@@ -29,7 +32,7 @@ class AtomAction extends Action {
     const parentAction = this.getParentAction();
     parentAction.onMove(dragPath, dropPath, options);
   }
-  onSizeChange(path: number[], options: IAnySizeOptions) {
+  onSizeChange(path: number[], options: IAnySizeOptions<any>) {
     const { direction, mouseClientOffset, originMouseClientOffset } = options;
     const { x, y } = calcMovePosition(
       originMouseClientOffset,
@@ -55,17 +58,11 @@ class AtomAction extends Action {
 const EditContainer = {
   ...PreviewAtom,
   action: AtomAction,
-  renderer: (props: IAtomRenderer) => {
-    const {
-      layout,
-      activePath,
-      onActive,
-      layer,
-      onSizeChange,
-      onDrag,
-      onDragEnd,
-      path,
-    } = props;
+  renderer: (props: IComponentRender) => {
+    const { layout, path } = props;
+    const { layer, interact, active } = useGlobalContext<any>();
+    const layerContext = useLayerContext();
+    const { onSizeChange, onDrag, onDragEnd, onActive } = interact;
     const { x, y, w, h } = layout;
     const Renderer = PreviewAtom.renderer;
     // @ts-ignore
@@ -106,19 +103,19 @@ const EditContainer = {
           <Renderer {...props} />
           <ActiveFrame
             onActive={() => {
-              onActive(path);
+              onActive(layout.id);
             }}
             ActiveOperateComponent={() => {
               return <div></div>;
             }}
-            activePath={activePath}
+            active={active === layout.id}
             onSizeChange={(options) => {
               onSizeChange(path, {
                 ...options,
-                size,
+                layerContext,
               });
             }}
-            layer={layer}
+            layer={layer.current}
             path={path}
           />
         </div>

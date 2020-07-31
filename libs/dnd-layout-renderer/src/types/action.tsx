@@ -15,7 +15,7 @@ export enum DragDirection {
   TOP = 'top',
 }
 
-export interface SizeOptions extends BaseDndOptions {
+export interface ISizeOptions extends BaseDndOptions {
   direction: DragDirection;
 }
 
@@ -39,7 +39,8 @@ export interface BaseAction {
 
   onMove(dragPath: number[], dropPath: number[], options: DropOptions): void;
 
-  onSizeChange(path: number[], sizeOptions: SizeOptions): void;
+  onSizeChange(path: number[], sizeOptions: ISizeOptions): void;
+  onSizeChanging(path: number[], sizeOptions: ISizeOptions): void;
 }
 export interface IAction {
   /**
@@ -81,6 +82,9 @@ export abstract class Action implements BaseAction, IAction {
       this[key] = params[key];
     });
     this.index = params.path[params.path.length - 1];
+  }
+  onSizeChanging(path: number[], sizeOptions: ISizeOptions): void {
+    throw new Error("Method not implemented.");
   }
 
   /**
@@ -236,7 +240,7 @@ export abstract class Action implements BaseAction, IAction {
     dropPath: number[],
     options: DropOptions
   ): void;
-  abstract onSizeChange(path: number[], options: SizeOptions): void;
+  abstract onSizeChange(path: number[], options: ISizeOptions): void;
 }
 
 export function getAction(type: string) {
@@ -256,7 +260,7 @@ class ActionInstance extends Action {
   onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
-  onSizeChange(dragPath: number[], options: SizeOptions): void {
+  onSizeChange(dragPath: number[], options: ISizeOptions): void {
     throw new Error('Method not implemented.');
   }
 }

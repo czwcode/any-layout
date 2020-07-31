@@ -1,15 +1,21 @@
-import { Action, DropOptions, INode, DragDirection, SizeOptions } from 'dnd-layout-renderer';
-import { IAnyLayoutTheme, ILayerContext } from '../context/theme';
+import {
+  Action,
+  DropOptions,
+  INode,
+  DragDirection,
+  ISizeOptions,
+} from 'dnd-layout-renderer';
+import { IAnyLayoutTheme, ILayerContext } from '../context/layerContext';
 
-export interface AnyDropOptions extends DropOptions {
-  layerContext: ILayerContext<IAnyLayoutTheme>
+export interface IAnyDropOptions<ITheme> extends DropOptions {
+  layerContext: ILayerContext<ITheme>;
 }
-export abstract class AnyAction extends Action {
+export abstract class AnyAction<ITheme> extends Action {
   abstract onDrag(): void;
   abstract onDrop(
     dragPath: number[],
     dropPath: number[],
-    options: AnyDropOptions
+    options: IAnyDropOptions<ITheme>
   ): void;
   abstract onRemove(): INode;
   abstract onMove(
@@ -17,7 +23,7 @@ export abstract class AnyAction extends Action {
     dropPath: number[],
     options: DropOptions
   ): void;
-  abstract onSizeChange(path: number[], options: SizeOptions): void;
+  abstract onSizeChange(path: number[], options: ISizeOptions): void;
 }
 
 class Animal {

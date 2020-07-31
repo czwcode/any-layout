@@ -7,11 +7,11 @@ import { SizeContext } from '../context';
 export interface BaseDndOptions {
   mouseClientOffset: XYCoord;
   originMouseClientOffset: XYCoord;
-  size: ISize;
 }
 export interface DropOptions extends BaseDndOptions {
   data: ILayout;
   dropBoundingRect: DOMRect;
+  size: ISize;
 }
 export interface IDropConfig<T extends DropOptions> {
   onDrop: (

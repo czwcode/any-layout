@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
+  IComponentRender,
   Action,
   ILayout,
   DragDirection,
   DropOptions,
   INode,
-  SizeOptions,
+  ISizeOptions,
 } from 'dnd-layout-renderer';
 import { ISizeContext } from 'dnd-layout-renderer';
 import { toReal, toVirtual } from '../../../utils/calcWidth';
@@ -18,9 +18,10 @@ import {
   INestLayoutTheme,
   LayerContext,
   useLayerContext,
-} from '../../../context/theme';
+} from '../../../context/layerContext';
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { IAnySizeOptions } from '../../../types/layout';
+import { AnyAction } from '../../../actions';
 export const ColType = 'col';
 export function getColNode(w: number, data: ILayout) {
   return {
@@ -29,7 +30,7 @@ export function getColNode(w: number, data: ILayout) {
     children: [data],
   } as ILayout;
 }
-class ColAction extends Action {
+class ColAction extends AnyAction<INestLayoutTheme> {
   onRemove(): INode {
     throw new Error('Method not implemented.');
   }
@@ -69,13 +70,15 @@ class ColAction extends Action {
       parentAction.onDrop(dragPath, dropPath, options);
     }
   }
-  onSizeChange(path: number[], options: IAnySizeOptions) {
-    const { direction, mouseClientOffset, originMouseClientOffset, layerContext } = options;
-    let { x} = calcMovePosition(
+  onSizeChange(path: number[], options: IAnySizeOptions<INestLayoutTheme>) {
+    const {
+      direction,
+      mouseClientOffset,
       originMouseClientOffset,
-      mouseClientOffset
-    );
-    x = toVirtual(x, layerContext.width)
+      layerContext,
+    } = options;
+    let { x } = calcMovePosition(originMouseClientOffset, mouseClientOffset);
+    x = toVirtual(x, layerContext.width);
     const node = this.getNode();
     const preSibling = this.getPreviousSibling();
     const nextSibling = this.getNextSibling();
@@ -88,7 +91,7 @@ class ColAction extends Action {
     }
   }
 }
-const Col: IAtom = {
+const Col: IComponent = {
   layoutType: LayoutType.Layout,
   atomType: ColType,
   action: ColAction,
@@ -101,7 +104,7 @@ const Col: IAtom = {
       width: toReal(layout.w, size.width) - w,
     };
   },
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     const { width } = React.useContext<ISizeContext>(SizeContext);
     const { theme } = useLayerContext<INestLayoutTheme>();
     const style = {

@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { useLayoutDrop, IDropConfig, DropOptions } from 'dnd-layout-renderer';
-import { IAnyLayoutTheme, LayerContext, ILayerContext } from '../context/theme';
+import {
+  IAnyLayoutTheme,
+  LayerContext,
+  ILayerContext,
+} from '../context/layerContext';
 
 export interface IAnyDropOptions extends DropOptions {
   layerContext: ILayerContext<IAnyLayoutTheme>;

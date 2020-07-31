@@ -1,42 +1,136 @@
-import { INode, ISize, ILayout } from 'dnd-layout-renderer';
-import { IGridLayoutTheme } from '../../../context/theme';
-import { AnyDropOptions } from '../../../actions';
+import {
+  INode,
+  ISize,
+  ILayout,
+  BaseDndOptions,
+  XYCoord,
+  DragDirection,
+} from 'dnd-layout-renderer';
+import { IGridLayoutTheme, ILayerContext } from '../../../context/layerContext';
 import { calcMovePosition } from '../../../utils/calcPosition';
-
-/**
- * 获取当前移动节点的位置
- *
- * @param {INode} dragNode
- * @param {PositionParams} positionParams
- * @param {number} index
- * @param {{ x: number; y: number }} movePosition
- * @param {number} width
- * @param {INode[]} nodes
- * @returns
- */
-export function generatePosition(
+import { toVirtual } from '../../../utils/calcWidth';
+import { IAnySizeOptions } from '../../../types/layout';
+export function setDragSize(direction: DragDirection, dragNode: INode, x, y) {
+  switch (direction) {
+    case DragDirection.BOTTOM:
+      dragNode.h = y + dragNode.h;
+      break;
+    case DragDirection.LEFT:
+      dragNode.w = x + dragNode.w;
+      break;
+    case DragDirection.RIGHT:
+      dragNode.w = x + dragNode.w;
+      break;
+    default:
+      break;
+  }
+  return dragNode
+}
+export function createSizeFakeNode(
   dragNode: INode,
-  positionParams: PositionParams,
-  movePosition: { x: number; y: number },
-  nodes: INode[]
-  ) {
-    const { id, x, y, w, h } = dragNode;
-  const { x: calcX, y: calcY } = calcXY(
-    positionParams,
-    movePosition.y,
-    movePosition.x
+  options: IAnySizeOptions<IGridLayoutTheme>
+) {
+  const {
+    direction,
+    mouseClientOffset,
+    originMouseClientOffset,
+    layerContext,
+    originNode
+  } = options;
+  const { width, theme } = layerContext;
+  const movePosition = calcMovePosition(
+    originMouseClientOffset,
+    mouseClientOffset
   );
-  let currentXOffset = crossBorderProtection(calcX + x, w);
+  const { x, y } = createSizeFakePosition(
+    movePosition,
+    getPositionParams(theme, width),
+    width
+  );
+  const newNode = setDragSize(direction, JSON.parse(JSON.stringify(originNode)) , x, y);
+  dragNode.w = newNode.w
+  dragNode.h = newNode.h
+  return dragNode;
+}
+export function createSizeFakePosition(
+  movePosition: XYCoord,
+  positionParams: PositionParams,
+  width: number
+) {
+  const xOffset = toVirtual(movePosition.x, width);
+  const yOffset = Math.floor(movePosition.y / positionParams.rowHeight);
+
+  return {
+    x: xOffset,
+    y: yOffset,
+  };
+}
+/**
+ *
+ *  根据鼠标的移动距离，构造移动状态的假节点信息
+ * @export
+ * @param {INode} originNode 原始节点的信息
+ * @param {XYCoord} movePosition 当前移动的x，y方向的偏移量
+ * @param {PositionParams} positionParams 计算的位置的辅助参数
+ */
+export function createMoveFakeNode(
+  originNode: INode,
+  movePosition: XYCoord,
+  positionParams: PositionParams
+) {
+  const { x, y } = calcXY(positionParams, movePosition.y, movePosition.x);
+  return {
+    ...originNode,
+    x: originNode.x + x,
+    y: originNode.y + y,
+  };
+}
+
+export function createFakeNode(
+  originNode: INode,
+  sameLevelNodes: INode[],
+  theme: IGridLayoutTheme,
+  layerWidth: number,
+  originMouseClientOffset: XYCoord,
+  mouseClientOffset: XYCoord
+) {
+  const movePosition = calcMovePosition(
+    originMouseClientOffset,
+    mouseClientOffset
+  );
+
+  // 生成真实假节点的位置
+  return {
+    ...originNode,
+    ...createFakeNodePosition(
+      createMoveFakeNode(
+        originNode,
+        movePosition,
+        getPositionParams(theme, layerWidth)
+      ),
+      sameLevelNodes
+    ),
+  };
+}
+/**
+ *  输入移动状态的假节点，输出实际假节点的位置
+ *
+ * @param {INode} moveFakeNode 构造出来的假节点
+ * @param {INode[]} nodes 所有相关节点，用来判断当前节点的合理位置
+ * @returns {{ x:number; y: number }} 实际假节点的位置，x表示生成的水平位置，y表示生成节点的垂直位置
+ */
+export function createFakeNodePosition(moveFakeNode: INode, nodes: INode[]) {
+  const { id, x, y, w, h } = moveFakeNode;
+  let currentXOffset = crossBorderProtection(x, w);
   // 节点当前的水平范围
   const currentXRange: IRange = [currentXOffset, currentXOffset + w];
-  const currentYRange: IRange = [calcY + y, calcY + y + h];
+  const currentYRange: IRange = [y, y + h];
   // 当前节点所有上方的节点
 
   const intersectItems = getIntersectItems(nodes, currentXRange).filter(
     (item) => item.data.id !== id
   );
   const upperNodes = getAllUpperNode(intersectItems, currentYRange[1]);
-  // console.log('upperNodes: ', movePosition, nodes, upperNodes, currentYRange);
   // 上方节点中最高的Y值
   const newY = getMaxY(upperNodes);
   return { x: currentXOffset, y: newY };
@@ -89,36 +183,21 @@ function getMaxY(nodes: INodeWithIndex[]) {
   }, 0);
 }
 
+export type IRelayoutOptions = BaseDndOptions & {
+  data: INode;
+  layerContext: ILayerContext<IGridLayoutTheme>;
+};
 /**
  * 重新排列所有节点的位置
  *
  * @export
- * @param {ILayout} node
- * @param {number} index
- * @param {number} width
+ * @param {ILayout} 和拖拽节点同级的所有节点
  * @param {AnyDropOptions} options
  */
-export function relayoutNodes(
-  node: ILayout,
-  options: AnyDropOptions
-) {
-  const { layerContext, data, originMouseClientOffset, mouseClientOffset, size } = options;
-  const { theme} = layerContext
-  const { w, h } = data;
-  const movePosition = calcMovePosition(originMouseClientOffset, mouseClientOffset)
-  const { x, y } = generatePosition(
-    data,
-    getPositionParams(theme, size.width),
-    movePosition,
-    node.children
-  );
-  const newNodes = sortNodes(node.children);
-  const newNodesWithIndex = newNodes.map((item, index) => ({
-    data: item,
-    index,
-  }));
-  const fakeNode = { x, y, w, h } as any;
-  layoutNodes(newNodesWithIndex, { data: fakeNode, index: -1 } as any, h);
+export function relayoutNodes(fakeNode: INode, children: ILayout[]) {
+  // 生成真实假节点的位置
+  const newNodes = sortNodes(children);
+  layoutNodes(newNodes, fakeNode);
   compact(sortNodes(newNodes.concat(fakeNode)));
 }
 /**
@@ -155,9 +234,8 @@ function decodePosition(position): [number, BoxPositionType] {
  * @param {INode[]} nodes
  */
 function compact(nodes: INode[]) {
-  const cachePosition = {};
   nodes.forEach((node) => {
-    compactItem(node, cachePosition);
+    compactItem(node, nodes);
   });
 }
 /**
@@ -166,24 +244,19 @@ function compact(nodes: INode[]) {
  * @param {INode} node
  * @param {*} cache
  */
-function compactItem(node: INode, cache: any) {
+function compactItem(node: INode, nodes: INode[]) {
   const { x, y, w, h } = node;
-  const range = [x, x + w];
-  const needCheckKeys = Object.keys(cache).filter((key) => {
-    let [newKey, boxPositionType] = decodePosition(key);
-    newKey = Number(newKey);
-    if (boxPositionType === BoxPositionType.Start) {
-      return newKey >= range[0] && newKey < range[1];
-    } else {
-      return newKey > range[0] && newKey <= range[1];
-    }
-  });
-  const maxY = needCheckKeys.reduce((max, key) => {
-    return Math.max(cache[key] || 0, max);
+  const othersNode = nodes.filter(item => item.id !== node.id)
+  // 找到当前节点上方的节点
+  const range = [x, x + w] as any;
+  const upperNodes = othersNode.filter(item => {
+    const itemRange = [item.x, item.x + item.w] as any
+    return isIntersect(itemRange, range) && y > item.y
+  })
+  const maxY = upperNodes.reduce((max, item) => {
+    return Math.max(item.y + item.h || 0, max);
   }, 0);
   node.y = maxY;
-  cache[encodePostion(x, BoxPositionType.Start)] = node.y + node.h;
-  cache[encodePostion(x + w, BoxPositionType.End)] = node.y + node.h;
 }
 /**
  * 对所有的节点重新布局
@@ -193,29 +266,25 @@ function compactItem(node: INode, cache: any) {
  * @param {INodeWithIndex} fakeItem
  * @param {number} moveH
  */
-export function layoutNodes(
-  nodes: INodeWithIndex[],
-  fakeItem: INodeWithIndex,
-  moveH: number
-) {
+export function layoutNodes(nodes: INode[], fakeItem: INode) {
   const overlapItems = nodes.filter((item) => collides(item, fakeItem));
   overlapItems.forEach((overlapItem) => {
-    overlapItem.data.y = fakeItem.data.h + overlapItem.data.y;
+    overlapItem.y = fakeItem.h + overlapItem.y;
   });
   overlapItems.forEach((overlapItem) => {
-    layoutNodes(nodes, overlapItem, moveH);
+    layoutNodes(nodes, overlapItem);
   });
 }
 
 /**
  * Given two layoutitems, check if they collide.
  */
-export function collides(l1: INodeWithIndex, l2: INodeWithIndex): boolean {
-  if (l1.index === l2.index) return false;
-  if (l1.data.x + l1.data.w <= l2.data.x) return false; // l1 is left of l2
-  if (l1.data.x >= l2.data.x + l2.data.w) return false; // l1 is right of l2
-  if (l1.data.y + l1.data.h <= l2.data.y) return false; // l1 is above l2
-  if (l1.data.y >= l2.data.y + l2.data.h) return false; // l1 is below l2
+export function collides(l1: INode, l2: INode): boolean {
+  if (l1.id === l2.id) return false;
+  if (l1.x + l1.w <= l2.x) return false; // l1 is left of l2
+  if (l1.x >= l2.x + l2.w) return false; // l1 is right of l2
+  if (l1.y + l1.h <= l2.y) return false; // l1 is above l2
+  if (l1.y >= l2.y + l2.h) return false; // l1 is below l2
   return true; // boxes overlap
 }
 
@@ -230,11 +299,11 @@ export function getPositionParams(theme: IGridLayoutTheme, width: number) {
 }
 export function getBoundingRect(
   theme: IGridLayoutTheme,
-  size: ISize,
+  width: number,
   node: INode
 ) {
   const { x, y, w, h } = node;
-  return calcGridItemPosition(getPositionParams(theme, size.width), x, y, w, h);
+  return calcGridItemPosition(getPositionParams(theme, width), x, y, w, h);
 }
 
 export interface PositionParams {

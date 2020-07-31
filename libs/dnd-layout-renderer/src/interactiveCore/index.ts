@@ -1,7 +1,12 @@
-import { ILayout, DragDirection, getActionInstance, SizeOptions } from '../types';
+import {
+  ILayout,
+  DragDirection,
+  getActionInstance,
+  ISizeOptions,
+} from '../types';
 import TreeSolver from './TreeSolver';
 import { produce } from 'immer';
-import {  DropOptions } from '../hooks';
+import { DropOptions } from '../hooks';
 
 export default class InteractiveCore {
   /**
@@ -51,7 +56,7 @@ export default class InteractiveCore {
    *
    * @memberof InteractiveCore
    */
-  onSizeChange(path: number[], options: SizeOptions) {
+  onSizeChange(path: number[], options: ISizeOptions) {
     const newCore = produce<TreeSolver>(this.treeCore, (core: any) => {
       const node = core.getNode(path);
       getActionInstance({
@@ -59,6 +64,22 @@ export default class InteractiveCore {
         path,
         core,
       }).onSizeChange(path, options);
+    });
+    this.updateCore(newCore);
+  }
+  /**
+   * 修改组件宽度
+   *
+   * @memberof InteractiveCore
+   */
+  onSizeChanging(path: number[], options: ISizeOptions) {
+    const newCore = produce<TreeSolver>(this.treeCore, (core: any) => {
+      const node = core.getNode(path);
+      getActionInstance({
+        node,
+        path,
+        core,
+      }).onSizeChanging(path, options);
     });
     this.updateCore(newCore);
   }

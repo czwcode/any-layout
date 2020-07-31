@@ -1,20 +1,29 @@
 import React from 'react';
 import PreviewAtom from './preview';
 import {
-  IAtomRenderer,
+  IComponentRender,
   LayerType,
   Action,
   DropOptions,
   INode,
   ISizeContext,
   SizeContext,
-  SizeOptions,
 } from 'dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
-import { LayerContext, IGridLayoutTheme } from '../../../context/theme';
+import {
+  IGridLayoutTheme,
+  useLayerContext,
+} from '../../../context/layerContext';
 import { useAnyLayoutDrag } from '../../../hooks/useAnyDrag';
-import { getBoundingRect } from '../Layer/calcUtils';
+import {
+  getBoundingRect,
+  createSizeFakeNode,
+  getPositionParams,
+} from '../Layer/calcUtils';
 import { IAnySizeOptions } from '../../../types/layout';
+import { useGlobalContext } from '../../../context/GlobalContext';
+import { calcMovePosition } from '../../../utils/calcPosition';
+import { FakeNodePlaceHolder, usePrevious } from '../Layer';
 
 class AtomAction extends Action {
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
@@ -30,29 +39,35 @@ class AtomAction extends Action {
     const parentAction = this.getParentAction();
     parentAction.onMove(dragPath, dropPath, options);
   }
-  onSizeChange(path: number[], options: IAnySizeOptions) {
+  onSizeChange(path: number[], options: IAnySizeOptions<IGridLayoutTheme>) {
     const parentAction = this.getParentAction();
     parentAction.onSizeChange(path, options);
+  }
+  onSizeChanging(path: number[], options: IAnySizeOptions<IGridLayoutTheme>) {
+    const parentAction = this.getParentAction();
+    parentAction.onSizeChanging(path, options);
   }
 }
 const EditContainer = {
   ...PreviewAtom,
   action: AtomAction,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
+    const { layout, path } = props;
+    const layerContext = useLayerContext<IGridLayoutTheme>();
+    const { theme } = layerContext;
+    const { layer, interact, active } = useGlobalContext<IGridLayoutTheme>();
     const {
-      layout,
-      activePath,
-      onActive,
-      layer,
       onSizeChange,
       onDrag,
       onDragEnd,
-      path,
-    } = props;
-    const { theme }: { theme: IGridLayoutTheme } = React.useContext(
-      LayerContext
-    );
+      onActive,
+      onSizeChanging,
+    } = interact;
     const size = React.useContext<ISizeContext>(SizeContext);
+    const recordStartDragNode = React.useRef(null);
+    const [fakeNode, setFakeNode] = React.useState<INode>(null);
+    const [temporaryNode, setTemporaryNode] = React.useState<{ x: number , y: number}>(null);
+    const preFakeNode = usePrevious(fakeNode);
     // @ts-ignore
     const [collectDragProps, ref] = useAnyLayoutDrag<HTMLDivElement>({
       onDrag,
@@ -61,53 +76,98 @@ const EditContainer = {
       onDragEnd,
       path,
     });
-    const { width, height, left, top } = getBoundingRect(theme, size, layout);
+    const { width, height, left, top } = getBoundingRect(
+      theme,
+      size.width,
+      layout
+    );
+    const originPosition= recordStartDragNode.current && getBoundingRect(
+      theme,
+      size.width,
+      recordStartDragNode.current
+    );
+    console.log("dddddddd=====", layout.id)
     return (
-      <div
-        style={{
-          left: left,
-          top: top,
-          width: width,
-          height: height,
-          transition: 'all 200ms ease',
-          position: 'absolute',
-        }}
-      >
+      <>
         <div
-          ref={ref}
-          style={{ width: '100%', height: '100%', position: 'relative' }}
+          style={{
+            left: left,
+            top: top,
+            width: temporaryNode ? originPosition.width + temporaryNode.x :  width,
+            height: temporaryNode? originPosition.height + temporaryNode.y :  height,
+            transition: 'all 200ms ease',
+            position: 'absolute',
+          }}
         >
-          <PreviewAtom.renderer {...props}>
-            <div
-              style={{
-                height: '100%',
-                width: '100%',
-                position: 'absolute',
-                boxSizing: 'border-box',
-                top: 0,
-                border: '1px dashed lightgrey',
-              }}
-            ></div>
-            <ActiveFrame
-              onActive={() => {
-                onActive(path);
-              }}
-              ActiveOperateComponent={() => {
-                return <div></div>;
-              }}
-              activePath={activePath}
-              onSizeChange={(options) => {
-                onSizeChange(path, {
-                  ...options,
-                  size,
-                });
-              }}
-              layer={layer}
-              path={path}
-            />
-          </PreviewAtom.renderer>
+          <div
+            ref={ref}
+            style={{ width: '100%', height: '100%', position: 'relative' }}
+          >
+            <PreviewAtom.renderer {...props}>
+              <div
+                style={{
+                  height: '100%',
+                  width: '100%',
+                  position: 'absolute',
+                  boxSizing: 'border-box',
+                  top: 0,
+                  border: '1px dashed lightgrey',
+                }}
+              ></div>
+
+              <ActiveFrame
+                onActive={() => {
+                  onActive(layout.id);
+                }}
+                ActiveOperateComponent={() => {
+                  return <div></div>;
+                }}
+                active={active === layout.id}
+                onStartSizeChange={() => {
+                  recordStartDragNode.current = JSON.parse(
+                    JSON.stringify(layout)
+                  );
+                }}
+                onSizeChanging={(options) => {
+                  const fakeNode = createSizeFakeNode(
+                    { ...layout },
+                    {
+                      ...options,
+                      layerContext: layerContext,
+                      originNode: recordStartDragNode.current,
+                    }
+                  );
+                  // setTemporaryNode(calcMovePosition(options.originMouseClientOffset, options.mouseClientOffset))
+                  if (
+                    !preFakeNode ||
+                    preFakeNode.w !== fakeNode.w ||
+                    preFakeNode.h !== fakeNode.h
+                  ) {
+                    setFakeNode(fakeNode);
+                    onSizeChanging(path, {
+                      ...options,
+                      layerContext: layerContext,
+                      originNode: { ...recordStartDragNode.current },
+                    });
+                  }
+                }}
+                onSizeChange={(options) => {
+                  onSizeChange(path, {
+                    ...options,
+                    layerContext: layerContext,
+                    originNode: recordStartDragNode.current,
+                  });
+                  setFakeNode(null);
+                  setTemporaryNode(null);
+                }}
+                layer={layer.current}
+                path={path}
+              />
+            </PreviewAtom.renderer>
+          </div>
         </div>
-      </div>
+        {fakeNode && <FakeNodePlaceHolder layout={fakeNode} />}
+      </>
     );
   },
 };

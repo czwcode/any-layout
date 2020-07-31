@@ -2,7 +2,7 @@ import React from 'react';
 import PreviewAtom from './preview';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import {
-  IAtomRenderer,
+  IComponentRender,
   Action,
   DragDirection,
   DropOptions,
@@ -16,7 +16,8 @@ import { useAnyLayoutDragAndDop } from '../../../hooks/useAnyDragAndDrop';
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { toVirtual } from '../../../utils/calcWidth';
 import { IAnySizeOptions } from '../../../types/layout';
-import { LayerContext } from '../../../context/theme';
+import { LayerContext, INestLayoutTheme, useLayerContext } from '../../../context/layerContext';
+import { useGlobalContext } from '../../../context/GlobalContext';
 
 class AtomAction extends Action {
   onRemove(): INode {
@@ -57,7 +58,7 @@ class AtomAction extends Action {
       parentAction.onDrop(dragPath, dropPath, options);
     }
   }
-  onSizeChange(path: number[], options: IAnySizeOptions) {
+  onSizeChange(path: number[], options: IAnySizeOptions<INestLayoutTheme>) {
     const {
       direction,
       mouseClientOffset,
@@ -91,22 +92,17 @@ class AtomAction extends Action {
 const EditContainer = {
   ...PreviewAtom,
   action: AtomAction,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     const {
       layout,
-      onDrag,
-      onDrop,
-      onDragEnd,
       path,
-      activePath,
-      layer,
-      onActive,
-      onSizeChange,
     } = props;
     const Renderer = PreviewAtom.renderer;
+    const layerContext = useLayerContext<INestLayoutTheme>()
+    const { layer, interact, active  } = useGlobalContext<INestLayoutTheme>()
+    const { onSizeChange, onDrag, onDragEnd, onActive, onDrop } = interact;
     const [direction, setDirection] = React.useState<HoverDirection>(null);
     const size = React.useContext(SizeContext);
-    const layerContext = React.useContext(LayerContext);
     // @ts-ignore
     const [
       collectDragProps,
@@ -127,7 +123,7 @@ const EditContainer = {
         }
       },
       onDrop: (dragPath, path, options) => {
-        onDrop(dragPath, path, options);
+        onDrop(dragPath, path, { ...options, layerContext});
       },
     });
     React.useEffect(() => {
@@ -153,12 +149,12 @@ const EditContainer = {
           ></div>
           <ActiveFrame
             onActive={() => {
-              onActive(path);
+              onActive(layout.id);
             }}
             ActiveOperateComponent={() => {
               return <div></div>;
             }}
-            activePath={activePath}
+            active={active === layout.id}
             onSizeChange={(options) => {
               onSizeChange(path, {
                 ...options,
@@ -166,7 +162,7 @@ const EditContainer = {
                 size,
               } as any);
             }}
-            layer={layer}
+            layer={layer.current}
             path={path}
           />
           <DirectionOverlap direction={collectDropProps.isOver && direction} />

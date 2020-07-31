@@ -1,10 +1,10 @@
 import React from 'react';
-import { IAtom, LayoutType, IAtomRenderer } from 'dnd-layout-renderer';
+import { IComponent, LayoutType, IComponentRender } from 'dnd-layout-renderer';
 export const RowType = 'containerPanel';
-const Row: IAtom = {
+const Row: IComponent = {
   layoutType: LayoutType.Layout,
   atomType: RowType,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     return (
       <div style={{ display: 'flex', position: 'relative' }}>
         {props.children}

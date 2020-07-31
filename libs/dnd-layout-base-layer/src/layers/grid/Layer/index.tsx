@@ -1,33 +1,32 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
-  Action,
-  useLayoutDrop,
+  IComponentRender,
   INode,
-  DropOptions,
   ILayout,
   SizeContext,
   DragDirection,
-  SizeOptions,
 } from 'dnd-layout-renderer';
-import { toReal } from '../../../utils/calcWidth';
+import { toReal, toVirtual } from '../../../utils/calcWidth';
 import {
   IGridLayoutTheme,
-  LayerContext,
   useLayerContext,
-} from '../../../context/theme';
+} from '../../../context/layerContext';
 import { useAnyLayoutDrop } from '../../../hooks/useAnyDrop';
-import { AnyDropOptions, AnyAction } from '../../../actions';
+import { IAnyDropOptions, AnyAction } from '../../../actions';
 import {
   getBoundingRect,
   relayoutNodes,
+  createFakeNode as createMoveFakeNode,
+  setDragSize,
+  createSizeFakeNode,
   getPositionParams,
-  generatePosition,
 } from './calcUtils';
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { IAnySizeOptions } from '../../../types/layout';
+import { useGlobalContext } from '../../../context/GlobalContext';
+import { throttle } from '../../../utils/base';
 export const GridLayerType = 'gridLayer';
 export function usePrevious<T>(value: T) {
   const ref = React.useRef<T>();
@@ -36,80 +35,119 @@ export function usePrevious<T>(value: T) {
   });
   return ref.current;
 }
-class RowAction extends AnyAction {
+class RowAction extends AnyAction<IGridLayoutTheme> {
   onRemove(): INode {
     throw new Error('Method not implemented.');
   }
-  onSizeChange(dragPath: number[], options: IAnySizeOptions): void {
-    const { direction, mouseClientOffset, originMouseClientOffset } = options;
-    const movePosition = calcMovePosition(
-      originMouseClientOffset,
-      mouseClientOffset
-    );
-
+  onSizeChange(
+    dragPath: number[],
+    options: IAnySizeOptions<IGridLayoutTheme>
+  ): void {
     const node = this.getNode();
-    switch (direction) {
-      case DragDirection.BOTTOM:
-        node.h = movePosition.y + node.h;
-        break;
-      case DragDirection.LEFT:
-        node.w = movePosition.x + node.w;
-        break;
-      case DragDirection.RIGHT:
-        node.w = movePosition.x + node.w;
-        break;
-
-      default:
-        break;
-    }
-
     const lastPath = dragPath[dragPath.length - 1];
-    // const { dropBoundingRect } = options;
-    // const { width } = dropBoundingRect;
-    // relayoutNodes(this.getNode(), options);
+    const dragNode = node.children[lastPath];
+    const newDragNode = createSizeFakeNode(dragNode, options);
+    relayoutNodes(
+      newDragNode,
+      node.children.filter((item) => item.id !== dragNode.id)
+    );
+  }
+
+  onSizeChanging(
+    dragPath: number[],
+    options: IAnySizeOptions<IGridLayoutTheme>
+  ): void {
+    const node = this.getNode();
+    const lastPath = dragPath[dragPath.length - 1];
+    const dragNode = node.children[lastPath];
+    const newDragNode = createSizeFakeNode(
+      JSON.parse(JSON.stringify(dragNode)),
+      options
+    );
+    relayoutNodes(
+      newDragNode,
+      node.children.filter((item) => item.id !== dragNode.id)
+    );
   }
   onDrag() {}
-  onDrop(dragPath: number[], dropPath: number[], options: AnyDropOptions) {
+  onDrop(
+    dragPath: number[],
+    dropPath: number[],
+    options: IAnyDropOptions<IGridLayoutTheme>
+  ) {
     const lastPath = dragPath[dragPath.length - 1];
     const {
       data,
       originMouseClientOffset,
       mouseClientOffset,
-      dropBoundingRect,
       layerContext,
       size,
     } = options;
-    const theme = layerContext.theme
-    const movePosition = calcMovePosition(
+    const theme = layerContext.theme;
+    const node = this.getNode();
+    relayoutNodes(
+      createMoveFakeNode(
+        data,
+        node.children,
+        theme,
+        layerContext.width,
+        originMouseClientOffset,
+        mouseClientOffset
+      ),
+      this.getNode().children
+    );
+    const fakeNode = createMoveFakeNode(
+      data,
+      node.children,
+      theme,
+      size.width,
       originMouseClientOffset,
       mouseClientOffset
     );
-    const { width } = dropBoundingRect;
-    const node = this.getNode();
-    relayoutNodes(this.getNode(), options);
-    const { x, y } = generatePosition(
-      data,
-      getPositionParams(theme, size.width),
-      movePosition,
-      node.children
-    );
-    data.x = x;
-    data.y = y;
+    data.x = fakeNode.x;
+    data.y = fakeNode.y;
     this.getNode().children.splice(lastPath, 0, data);
   }
-  onMove(dragPath: number[], dropPath: number[], options: AnyDropOptions) {
-    relayoutNodes(this.getNode(), options);
+  onMove(
+    dragPath: number[],
+    dropPath: number[],
+    options: IAnyDropOptions<IGridLayoutTheme>
+  ) {
+    const {
+      data,
+      originMouseClientOffset,
+      mouseClientOffset,
+      layerContext,
+      size,
+    } = options;
+    const theme = layerContext.theme;
+    const node = this.getNode();
+    relayoutNodes(
+      createMoveFakeNode(
+        data,
+        node.children,
+        theme,
+        layerContext.width,
+        originMouseClientOffset,
+        mouseClientOffset
+      ),
+      node.children
+    );
   }
 }
 
-const GridLayer: IAtom = {
+const GridLayer: IComponent = {
   layoutType: LayoutType.Layer,
   atomType: GridLayerType,
   action: RowAction,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     const { theme } = useLayerContext<IGridLayoutTheme>();
     const size = React.useContext(SizeContext);
-    const { layout, path, onMove } = props;
+    const { layout, path } = props;
+    const { interact } = useGlobalContext<IGridLayoutTheme>();
+    console.log("dddddddd=====", layout.id)
+    let { onMove, onDrop } = interact;
+    onMove = throttle(onMove, 100)
     const [position, setPosition] = React.useState<{
       data: ILayout;
     }>(null);
@@ -120,28 +158,28 @@ const GridLayer: IAtom = {
     const [_, ref] = useAnyLayoutDrop<HTMLDivElement>({
       path,
       onHover: (dragPath, path, options) => {
-        const { data, originMouseClientOffset, mouseClientOffset  } = options;
-        
+        const { data, originMouseClientOffset, mouseClientOffset } = options;
+
         if (!position) {
           setPosition({
             data: data,
           });
         } else {
-          const movePosition = calcMovePosition(originMouseClientOffset, mouseClientOffset)
-          const { x, y } = generatePosition(
+          const fakeNode = createMoveFakeNode(
             data,
-            getPositionParams(theme, size.width),
-            movePosition,
-            layout.children
+            layout.children,
+            theme,
+            size.width,
+            originMouseClientOffset,
+            mouseClientOffset
           );
           // 找到当前合适的位置
-          if (prePosition.data.x !== x || prePosition.data.y !== y) {
+          if (
+            prePosition.data.x !== fakeNode.x ||
+            prePosition.data.y !== fakeNode.y
+          ) {
             setPosition({
-              data: {
-                ...data,
-                x,
-                y,
-              },
+              data: fakeNode,
             });
             onMove(dragPath, path, options);
           }
@@ -149,12 +187,10 @@ const GridLayer: IAtom = {
       },
       onDrop: (dragPath, path, options) => {
         setPosition(null);
-        props.onDrop(dragPath, path, options);
+        onDrop(dragPath, path, options);
       },
     });
     // placeholder的大小
-    const placeholderBounderRect =
-      position && getBoundingRect(theme, size, position.data);
     return (
       <div
         ref={ref}
@@ -170,37 +206,34 @@ const GridLayer: IAtom = {
         }}
       >
         {props.children}
-        {position && placeholderBounderRect && (
-          <PlaceHolder
-            x={placeholderBounderRect.left}
-            y={placeholderBounderRect.top}
-            width={placeholderBounderRect.width}
-            height={placeholderBounderRect.height}
-          />
-        )}
+        {position && <FakeNodePlaceHolder layout={position.data} />}
       </div>
     );
   },
 };
 export interface IPlaceHolder {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  layout: INode;
 }
 
-function PlaceHolder(props: IPlaceHolder) {
-  const { x, y, width, height } = props;
+export function FakeNodePlaceHolder(props: IPlaceHolder) {
+  const { layout } = props;
+  const layerContext = useLayerContext<any>();
+  const { left, top, width, height } = getBoundingRect(
+    layerContext.theme,
+    layerContext.width,
+    layout
+  );
   return (
     <div
       style={{
         background: 'pink',
         position: 'absolute',
+        opacity: 0.3,
         transition: 'all 200ms ease',
         width,
         height,
-        left: x,
-        top: y,
+        left: left,
+        top: top,
       }}
     ></div>
   );

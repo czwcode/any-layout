@@ -1,10 +1,10 @@
 import React from 'react';
-import { IAtom, LayoutType, IAtomRenderer } from 'dnd-layout-renderer';
+import { IComponent, LayoutType, IComponentRender } from 'dnd-layout-renderer';
 export const ContainerType = 'container';
-const Container: IAtom = {
+const Container: IComponent = {
   layoutType: LayoutType.Container,
   atomType: ContainerType,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     return <div> {props.children} </div>;
   },
 };

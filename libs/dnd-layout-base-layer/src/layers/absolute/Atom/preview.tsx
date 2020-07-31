@@ -1,20 +1,19 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
+  IComponentRender,
   SizeContext,
 } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
 export const AtomType = 'absoluteAtom';
 
-
-const Widget: IAtom = {
+const Widget: IComponent = {
   layoutType: LayoutType.Atom,
   atomType: AtomType,
-  renderer: (props: IAtomRenderer) => {
-    const { layout,  } = props;
-    const size =React.useContext(SizeContext)
+  renderer: (props: IComponentRender) => {
+    const { layout } = props;
+    const size = React.useContext(SizeContext);
     const { width, height } = size;
     console.log('width: ', width);
     return (
@@ -24,7 +23,7 @@ const Widget: IAtom = {
           background: 'white',
           position: 'relative',
           minHeight: layout.h,
-          width: toReal(layout.w,width),
+          width: toReal(layout.w, width),
         }}
       >
         111

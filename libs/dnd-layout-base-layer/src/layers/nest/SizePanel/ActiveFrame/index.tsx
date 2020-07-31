@@ -1,21 +1,23 @@
 import React, { useRef } from 'react';
 import DragPaneWrapper, { DragPaneWrapperProps } from '../DragWrapper';
 import { encodePath } from 'dnd-layout-renderer';
-type IActiveFrame = DragPaneWrapperProps &  {
+type IActiveFrame = DragPaneWrapperProps & {
   onActive: () => void;
-  activePath: number[]
+  active: boolean;
   ActiveOperateComponent: () => React.ReactNode;
 };
 const ActiveFrame = (props: IActiveFrame) => {
   let {
     onSizeChange,
+    onSizeChanging,
+    onStartSizeChange,
     path,
     layer,
     onActive,
-    activePath,
+    active,
     ActiveOperateComponent,
   } = props;
-  const isActive = encodePath(path) === encodePath(activePath)
+
   const frame = React.useRef<HTMLDivElement>(null);
   // const copyFunc = () => {
   //   return layoutCore.updateLayoutWhenDrop(DragDirection.BOTTOM, path, layout, true)
@@ -37,12 +39,11 @@ const ActiveFrame = (props: IActiveFrame) => {
         position: 'absolute',
       }}
     >
-      {isActive && ActiveOperateComponent && ActiveOperateComponent()}
-      {isActive && frame.current && (
+      {active && ActiveOperateComponent && ActiveOperateComponent()}
+      {active && frame.current && (
         <DragPaneWrapper
+          {...props}
           layer={layer}
-          onSizeChange={onSizeChange}
-          path={path}
           widgetLayer={frame.current}
         />
       )}

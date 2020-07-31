@@ -1,25 +1,27 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
+  IComponentRender,
   Action,
   useLayoutDrop,
   INode,
   DropOptions,
   SizeContext,
-  SizeOptions,
+  ISizeOptions,
 } from 'dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
-import { LayerContext } from '../../../context/theme';
+import { LayerContext, useLayerContext } from '../../../context/layerContext';
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { IAnySizeOptions } from '../../../types/layout';
+import { AnyAction } from '../../../actions';
+import { useGlobalContext } from '../../../context/GlobalContext';
 export const AbsoluteLayerType = 'absoluteLayer';
-class RowAction extends Action {
+class RowAction extends AnyAction<any> {
   onRemove(): INode {
     throw new Error('Method not implemented.');
   }
-  onSizeChange(path: number[], options: IAnySizeOptions): void {
+  onSizeChange(path: number[], options: IAnySizeOptions<any>): void {
     throw new Error('Method not implemented.');
   }
   onDrag() {
@@ -40,12 +42,14 @@ class RowAction extends Action {
   }
   onMove(dragPath: number[], dropPath: number[], options: DropOptions) {}
 }
-const Row: IAtom = {
+const Row: IComponent = {
   layoutType: LayoutType.Layer,
   atomType: AbsoluteLayerType,
   action: RowAction,
-  renderer: (props: IAtomRenderer) => {
-    const theme = React.useContext(LayerContext);
+  renderer: (props: IComponentRender) => {
+    const { interact } = useGlobalContext<any>();
+    const layerContext = useLayerContext();
+    const { onDrop } = interact;
     const size = React.useContext(SizeContext);
     const { layout, path } = props;
 
@@ -54,7 +58,7 @@ const Row: IAtom = {
     const [_, ref] = useLayoutDrop<HTMLDivElement>({
       path,
       onDrop: (dragPath, path, options) => {
-        props.onDrop(dragPath, path, options);
+        onDrop(dragPath, path, { ...options, layerContext });
       },
     });
     return (

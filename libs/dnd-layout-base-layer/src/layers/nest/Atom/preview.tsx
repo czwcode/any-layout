@@ -1,16 +1,20 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
+  IComponentRender,
   ISizeContext,
   SizeContext,
 } from 'dnd-layout-renderer';
 import { defaultAtomRenderer } from '../../../utils/rendererHelp';
-import { INestLayoutTheme, LayerContext, useLayerContext } from '../../../context/theme';
+import {
+  INestLayoutTheme,
+  LayerContext,
+  useLayerContext,
+} from '../../../context/layerContext';
 export const AtomType = 'nestAtom';
 
-const Widget: IAtom = {
+const Widget: IComponent = {
   layoutType: LayoutType.Atom,
   atomType: AtomType,
   sizeProcess: (config) => {
@@ -22,7 +26,7 @@ const Widget: IAtom = {
       height: layout.h - (lastPath === 0 ? 0 : theme.atom.gap),
     };
   },
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     const {
       layout,
       children,

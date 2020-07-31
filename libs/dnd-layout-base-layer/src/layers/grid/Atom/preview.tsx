@@ -1,23 +1,26 @@
 import React from 'react';
 import {
-  IAtom,
+  IComponent,
   LayoutType,
-  IAtomRenderer,
+  IComponentRender,
   SizeContext,
 } from 'dnd-layout-renderer';
 import { defaultAtomRenderer } from '../../../utils/rendererHelp';
-import { IGridLayoutTheme, useLayerContext } from '../../../context/theme';
+import {
+  IGridLayoutTheme,
+  useLayerContext,
+} from '../../../context/layerContext';
 import { getBoundingRect } from '../Layer/calcUtils';
 export const AtomType = 'gridAtom';
 
-const Widget: IAtom = {
+const Widget: IComponent = {
   layoutType: LayoutType.Atom,
   atomType: AtomType,
-  renderer: (props: IAtomRenderer) => {
+  renderer: (props: IComponentRender) => {
     const { layout, atomFrameRenderer = defaultAtomRenderer } = props;
-    const { theme }  = useLayerContext<IGridLayoutTheme>();
-    const size= React.useContext(SizeContext);
-    const { width, height } = getBoundingRect(theme, size, layout);
+    const { theme } = useLayerContext<IGridLayoutTheme>();
+    const size = React.useContext(SizeContext);
+    const { width, height } = getBoundingRect(theme, size.width, layout);
     return (
       <div
         className='absolute-atom'
