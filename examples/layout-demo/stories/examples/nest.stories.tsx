@@ -45,7 +45,7 @@ export const 自定义拖拽展示 = () => {
                               {
                                 id: '4444',
                                 type: 'nestAtom',
-                                h: 300,
+                                h: 6,
                               },
                             ],
                           },
@@ -57,7 +57,7 @@ export const 自定义拖拽展示 = () => {
                               {
                                 id: '555',
                                 type: 'nestAtom',
-                                h: 300,
+                                h: 6,
                               },
                             ],
                           },
@@ -104,7 +104,7 @@ function getColor() {
 }
 const rowNums = 4;
 function generateAtoms(nums) {
-  const height = 500;
+  const height = 15;
   const middle = height / nums;
   let atoms = [];
   let sum = 0;
@@ -186,7 +186,7 @@ export const Atom自定义渲染 = () => {
         重新生成布局
       </button>
       <AnyLayout
-        atomFrameRenderer={(props) => {
+        AtomRenderer={(props) => {
           const { width, height, node } = props;
           console.log(node.state);
           return (
@@ -214,7 +214,7 @@ export const 外部拖入 = () => {
       <DragFrame
         data={{
           type: 'nestAtom',
-          h: 200,
+          h: 6,
         }}
       >
         <div style={{ width: 200, padding: 12, border: '1px solid #23a' }}>
@@ -284,7 +284,7 @@ export const 外部修改atom状态 = () => {
                         {
                           id: '444',
                           type: 'nestAtom',
-                          h: 300,
+                          h: 6,
                           state: {
                             a: 1,
                           },
@@ -299,7 +299,7 @@ export const 外部修改atom状态 = () => {
                         {
                           id: '555',
                           type: 'nestAtom',
-                          h: 300,
+                          h: 6,
                         },
                       ],
                     },
@@ -329,7 +329,7 @@ export const 外部修改atom状态 = () => {
           onLayoutChange={(layout) => {
             setLayout(layout);
           }}
-          atomFrameRenderer={(props) => {
+          AtomRenderer={(props) => {
             const { node } = props;
             const { state } = node;
             return <div>{state ? state.a : '未定义'}</div>;

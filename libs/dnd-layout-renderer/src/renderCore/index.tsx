@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { ILayout } from '../types/layout';
 import { SizeMe } from 'react-sizeme';
 import DragLayer, { IDragLayerFrameRenderer } from '../helps/DragLayer';
@@ -9,9 +9,9 @@ export * from './LayoutTravse';
 export * from '../context/LayoutTravseContext';
 
 export function RenderCore(props: IRenderCore) {
-  const { layout,withRef,  DragBoxRenderer } = props;
+  const { layout, withRef, DragBoxRenderer } = props;
   const layerRef = useRef<HTMLDivElement>(null);
-  withRef.current = layerRef.current
+  withRef.current = layerRef.current;
   return (
     <div
       className='render-core-wrapper'
@@ -26,27 +26,20 @@ export function RenderCore(props: IRenderCore) {
           {({ size }) => {
             const { width = 0 } = size;
             console.log('props: ', props);
+          
             return (
               <div className='render-core'>
-                <SizeContext.Provider
-                  value={{
-                    width,
-                    height: null,
-                  }}
-                >
-                  <LayoutTravse {...props} layout={layout} />
-                  
-                </SizeContext.Provider>
+                <LayoutTravse {...props} layout={layout} width={width} />
               </div>
             );
           }}
         </SizeMe>
       )}
 
-      {/* <DragLayer
+      <DragLayer
         DragBoxRenderer={DragBoxRenderer}
         layerRef={layerRef.current}
-      /> */}
+      />
     </div>
   );
 }
@@ -63,7 +56,7 @@ export interface IRenderCore extends ILayoutTravseContext {
    * @memberof IRenderCore
    */
   DragBoxRenderer?: (props: IDragLayerFrameRenderer) => React.ReactNode;
-  withRef?: React.MutableRefObject<HTMLDivElement>
+  withRef?: React.MutableRefObject<HTMLDivElement>;
   // /**
   //  * 布局改变后的回调
   //  *

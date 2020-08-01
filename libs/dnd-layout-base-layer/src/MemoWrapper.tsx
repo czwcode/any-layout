@@ -15,9 +15,11 @@ export function getMemoWrapper() {
     >(Wrapper, (preProps, nextProps) => {
       // 布局大小改变，不应该在这里校验
       const checkAttribute = ['layout', 'active'];
-      return checkAttribute.every((key) => {
-        return !nextProps[key] ? false : preProps[key] === nextProps[key];
+      const isEqual = checkAttribute.every((key) => {
+        const isEqual =  !nextProps[key] ? false : preProps[key] === nextProps[key];
+        return isEqual
       });
+      return isEqual
     });
   }
   return MemoWrapper as React.ComponentClass<{

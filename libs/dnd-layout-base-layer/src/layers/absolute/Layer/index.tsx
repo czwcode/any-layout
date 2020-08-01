@@ -42,7 +42,7 @@ class RowAction extends AnyAction<any> {
   }
   onMove(dragPath: number[], dropPath: number[], options: DropOptions) {}
 }
-const Row: IComponent = {
+const Row: IComponent<any> = {
   layoutType: LayoutType.Layer,
   atomType: AbsoluteLayerType,
   action: RowAction,

@@ -41,21 +41,26 @@ export interface IDropReturnInfo {
 const throttle = (func, limit) => {
   let lastFunc
   let lastRan
-  return function() {
-    // @ts-ignore
-    const context = this as any
-    const args = arguments
-    if (!lastRan) {
-      func.apply(context, args)
-      lastRan = Date.now()
-    } else {
+  return {
+    callback: function() {
+      // @ts-ignore
+      const context = this as any
+      const args = arguments
+      if (!lastRan) {
+        func.apply(context, args)
+        lastRan = Date.now()
+      } else {
+        clearTimeout(lastFunc)
+        lastFunc = setTimeout(function() {
+          if ((Date.now() - lastRan) >= limit) {
+            func.apply(context, args)
+            lastRan = Date.now()
+          }
+        }, limit - (Date.now() - lastRan))
+      }
+    }as any,
+    clear: () => {
       clearTimeout(lastFunc)
-      lastFunc = setTimeout(function() {
-        if ((Date.now() - lastRan) >= limit) {
-          func.apply(context, args)
-          lastRan = Date.now()
-        }
-      }, limit - (Date.now() - lastRan))
     }
   }
 }
@@ -64,13 +69,15 @@ export const useLayoutDrop = <T extends HTMLElement>(
 ) => {
   const ref = React.useRef<T>(null);
   let { onHover = () => {}, path, accept = DragDropType.Widget, onDrop } = config;
-  onHover =  throttle(onHover, 100)
+  const{ callback: throttleOnHover,clear } =  throttle(onHover, 100)
   const positionInfo = React.useRef(null);
   const size = React.useContext(SizeContext);
   const [collectionDropProps, drop] = useDrop<DragInfo, null, IDropReturnInfo>({
     accept: accept,
     drop: (item, monitor) => {
       const clientOffset = monitor.getClientOffset();
+      // 清楚onHover的回调
+      clear()
       onDrop(item.path, path, {
         mouseClientOffset: clientOffset,
         size,
@@ -105,12 +112,11 @@ export const useLayoutDrop = <T extends HTMLElement>(
           originMouseY: clientOffset.y,
         };
       }
-      onHover &&
-        onHover(item.path, path, {
+      throttleOnHover(item.path, path, {
           data: JSON.parse(JSON.stringify(item.data)),
           size,
           mouseClientOffset: clientOffset,
-          // dropBoundingRect: ref.current.getBoundingClientRect(),
+          dropBoundingRect: ref.current.getBoundingClientRect(),
           originMouseClientOffset: {
             x: positionInfo.current.originMouseX,
             y: positionInfo.current.originMouseY,

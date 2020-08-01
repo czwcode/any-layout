@@ -32,9 +32,7 @@ class AtomAction extends Action {
   onRemove(): INode {
     throw new Error('Method not implemented.');
   }
-  onDrag() {
-    this.removeSelf();
-  }
+  onDrag() {}
   onMove(dragPath, dropPath, options) {
     const parentAction = this.getParentAction();
     parentAction.onMove(dragPath, dropPath, options);
@@ -66,14 +64,24 @@ const EditContainer = {
     const size = React.useContext<ISizeContext>(SizeContext);
     const recordStartDragNode = React.useRef(null);
     const [fakeNode, setFakeNode] = React.useState<INode>(null);
-    const [temporaryNode, setTemporaryNode] = React.useState<{ x: number , y: number}>(null);
+    const [hidden, setHidden] = React.useState<boolean>(false);
+    const [temporaryNode, setTemporaryNode] = React.useState<{
+      x: number;
+      y: number;
+    }>(null);
     const preFakeNode = usePrevious(fakeNode);
     // @ts-ignore
     const [collectDragProps, ref] = useAnyLayoutDrag<HTMLDivElement>({
-      onDrag,
+      onDrag: (...arg) => {
+        setHidden(true);
+        onDrag(...arg);
+      },
       layerType: LayerType.Absolute,
       data: JSON.parse(JSON.stringify(layout)),
-      onDragEnd,
+      onDragEnd: () => {
+        setHidden(false);
+        onDragEnd(path);
+      },
       path,
     });
     const { width, height, left, top } = getBoundingRect(
@@ -81,24 +89,23 @@ const EditContainer = {
       size.width,
       layout
     );
-    const originPosition= recordStartDragNode.current && getBoundingRect(
-      theme,
-      size.width,
-      recordStartDragNode.current
-    );
+    const originPosition =
+      recordStartDragNode.current &&
+      getBoundingRect(theme, size.width, recordStartDragNode.current);
+    const style: React.CSSProperties = {
+      // left: left,
+      // top: top,
+      transform: `translate(${left}px, ${top}px)`,
+      width: temporaryNode ? originPosition.width + temporaryNode.x : width,
+      height: temporaryNode ? originPosition.height + temporaryNode.y : height,
+      position: 'absolute',
+    };
+    if (hidden) {
+      return <div style={style} ref={ref}></div>;
+    }
     return (
       <>
-        <div
-          style={{
-            // left: left,
-            // top: top,
-            transform: `translate(${left}px, ${top}px)`,
-            width: temporaryNode ? originPosition.width + temporaryNode.x :  width,
-            height: temporaryNode? originPosition.height + temporaryNode.y :  height,
-            transition: 'all 200ms ease',
-            position: 'absolute',
-          }}
-        >
+        <div style={{transition: 'all 200ms ease', ...style}}>
           <div
             ref={ref}
             style={{ width: '100%', height: '100%', position: 'relative' }}

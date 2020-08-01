@@ -16,7 +16,11 @@ import { useAnyLayoutDragAndDop } from '../../../hooks/useAnyDragAndDrop';
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { toVirtual } from '../../../utils/calcWidth';
 import { IAnySizeOptions } from '../../../types/layout';
-import { LayerContext, INestLayoutTheme, useLayerContext } from '../../../context/layerContext';
+import {
+  LayerContext,
+  INestLayoutTheme,
+  useLayerContext,
+} from '../../../context/layerContext';
 import { useGlobalContext } from '../../../context/GlobalContext';
 
 class AtomAction extends Action {
@@ -38,7 +42,12 @@ class AtomAction extends Action {
     }
   }
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions) {
-    const { mouseClientOffset: clientOffset, dropBoundingRect, data } = options;
+    const {
+      mouseClientOffset: clientOffset,
+      dropBoundingRect,
+      data,
+      size,
+    } = options;
     const direction = calcDirection(dropBoundingRect, clientOffset);
     const node = this.getNode();
     const parent = this.getParent();
@@ -65,12 +74,12 @@ class AtomAction extends Action {
       originMouseClientOffset,
       layerContext,
     } = options;
-    const { width } = layerContext;
+    const { width, theme } = layerContext;
     const { x, y } = calcMovePosition(
       originMouseClientOffset,
       mouseClientOffset
     );
-    const size = toVirtual(y, width);
+    const size = Math.floor(y / theme.rowHeight);
     const node = this.getNode();
     const parent = this.getParent();
     const grandParent = this.getGrandParent();
@@ -93,13 +102,10 @@ const EditContainer = {
   ...PreviewAtom,
   action: AtomAction,
   renderer: (props: IComponentRender) => {
-    const {
-      layout,
-      path,
-    } = props;
+    const { layout, path } = props;
     const Renderer = PreviewAtom.renderer;
-    const layerContext = useLayerContext<INestLayoutTheme>()
-    const { layer, interact, active  } = useGlobalContext<INestLayoutTheme>()
+    const layerContext = useLayerContext<INestLayoutTheme>();
+    const { layer, interact, active } = useGlobalContext<INestLayoutTheme>();
     const { onSizeChange, onDrag, onDragEnd, onActive, onDrop } = interact;
     const [direction, setDirection] = React.useState<HoverDirection>(null);
     const size = React.useContext(SizeContext);
@@ -123,7 +129,7 @@ const EditContainer = {
         }
       },
       onDrop: (dragPath, path, options) => {
-        onDrop(dragPath, path, { ...options, layerContext});
+        onDrop(dragPath, path, { ...options, layerContext });
       },
     });
     React.useEffect(() => {

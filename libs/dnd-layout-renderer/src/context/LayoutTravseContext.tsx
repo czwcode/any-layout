@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createContext } from 'react';
 import { ILayout, LayoutType } from '../types/layout';
 
 export interface ITravseRendererFrame {
@@ -27,6 +27,6 @@ export interface ILayoutTravseContext {
     layoutType: LayoutType
   ) => any;
 }
-export const LayoutTravseContext = React.createContext<ILayoutTravseContext>(
+export const LayoutTravseContext = createContext<ILayoutTravseContext>(
   null
 );

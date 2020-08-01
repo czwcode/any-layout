@@ -33,7 +33,7 @@ class LayerAction extends Action {
     currentNode.children.push(getRowNode(options.data));
   }
 }
-const Row: IComponent = {
+const Row: IComponent<INestLayoutTheme> = {
   layoutType: LayoutType.Layer,
   action: LayerAction,
   atomType: NestLayoutType.Layer,

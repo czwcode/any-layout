@@ -8,7 +8,7 @@ import {
 import { toReal } from '../../../utils/calcWidth';
 export const AtomType = 'absoluteAtom';
 
-const Widget: IComponent = {
+const Widget: IComponent<any> = {
   layoutType: LayoutType.Atom,
   atomType: AtomType,
   renderer: (props: IComponentRender) => {

@@ -1,4 +1,15 @@
-import React, { memo, useState } from 'react';
+import React, {
+  memo,
+  useState,
+  useMemo,
+  Context,
+  useContext,
+  createContext,
+  Children,
+  useEffect,
+  useRef,
+} from 'react';
+import { usePrevious } from '../../../../libs/dnd-layout-base-layer/src/layers/grid/Layer';
 export default {
   title: '实验室/Test',
   parameters: {
@@ -6,38 +17,81 @@ export default {
   },
 };
 
-function FCTest(props: T) {
-  return <div>FCTest---{props.a}</div>;
+function safeUseContext(c: any) {
+  useMemo(() => {
+    React.useContext(c);
+  }, []);
+  return;
 }
+function FCTest(props: T) {
+  const a = useContext(Context);
+  const c = useContext(Context);
+  const b = useContext(Context2);
+  // const b = usePrevious(a);
+  // console.log(a === b);
+  console.log('render', a);
+  return (
+    <div>
+      {' '}
+        ----FCTest---{props.a}
+    </div>
+  );
+}
+
+function FCTest2(props: T) {
+  const a = useContext(Context);
+  // const b = usePrevious(a);
+  // console.log(a === b);
+  console.log('render2', a);
+  return <div> ----FCTest2---{props.a}</div>;
+}
+
 interface T {
   a?: number;
 }
-const MemoFC = memo(FCTest);
+const MemoFC = memo(FCTest, () => {
+  return true;
+});
 class ClassPureTest extends React.PureComponent {
   render() {
     return <div>ClassTest--Pure--</div>;
   }
 }
 class ClassTest extends React.Component<T> {
+  shouldComponentUpdate() {
+    return false;
+  }
   render() {
     return <div>ClassTest--{this.props.a}</div>;
   }
 }
+
+const ddd = { a: 3 };
+const Context = createContext(null);
+const Context2 = createContext({ a: 1 });
 export function T() {
   const [_, setState] = useState(1);
+  const v = useMemo(() => {
+    return { a: 2 };
+  }, []);
   return (
-    <div>
-      <button
-        onClick={() => {
-          setState((state) => state+ 1);
-        }}
-      >
-        触发刷新
-      </button>
-      <FCTest a={_} />
-      <MemoFC a={_} />
-      <ClassTest a={_} />
-      <ClassPureTest />
-    </div>
+    <Context.Provider value={ddd}>
+      <div>
+        <button
+          onClick={() => {
+            setState((state) => state + 1);
+          }}
+        >
+          触发刷新
+        </button>
+        {/* <FCTest a={_} /> */}
+        <MemoFC />
+        {/* <ClassTest a={_} /> */}
+        <ClassPureTest />
+      </div>
+    </Context.Provider>
   );
 }
+
+const a = createContext<string>(null);
+const b = createContext<string>(null);

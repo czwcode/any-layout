@@ -12,9 +12,10 @@ import {
   LayerContext,
   useLayerContext,
 } from '../../../context/layerContext';
+import { useGlobalContext } from '../../../context/GlobalContext';
 export const AtomType = 'nestAtom';
 
-const Widget: IComponent = {
+const Widget: IComponent<INestLayoutTheme> = {
   layoutType: LayoutType.Atom,
   atomType: AtomType,
   sizeProcess: (config) => {
@@ -23,19 +24,16 @@ const Widget: IComponent = {
     const { width } = size;
     return {
       width: width,
-      height: layout.h - (lastPath === 0 ? 0 : theme.atom.gap),
+      height:
+        layout.h * theme.rowHeight - (lastPath === 0 ? 0 : theme.atom.gap),
     };
   },
   renderer: (props: IComponentRender) => {
-    const {
-      layout,
-      children,
-      path,
-      atomFrameRenderer = defaultAtomRenderer,
-    } = props;
+    const { layout, children, path } = props;
     const lastPath = path[path.length - 1];
     const size = React.useContext<ISizeContext>(SizeContext);
     const { width, height } = size;
+    const { AtomRenderer } = useGlobalContext();
     const { theme } = useLayerContext<INestLayoutTheme>();
     return (
       <div
@@ -49,7 +47,7 @@ const Widget: IComponent = {
           ...theme.atom.style,
         }}
       >
-        {atomFrameRenderer({ node: layout, width, height: height })}
+        <AtomRenderer node={layout} width={width} height={height} />
         {children}
       </div>
     );

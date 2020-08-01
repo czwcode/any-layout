@@ -109,14 +109,6 @@ export default class InteractiveCore {
     });
     this.updateCore(newCore);
   }
-  onDropRow(path: number[], dropNode: ILayout) {
-    const newCore = produce(this.treeCore, (core) => {
-      const node = core.getNode(path);
-      // TODO: 自己实现
-      // getActionInstance(node, path, core).onDrop(HoverDirection.BOTTOM_OUT, dropNode);
-    });
-    this.updateCore(newCore);
-  }
   onMove(dragPath: number[], dropPath: number[], options: DropOptions) {
     const newCore = produce(this.treeCore, (core: any) => {
       const node = core.getNode(dropPath);

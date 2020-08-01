@@ -91,7 +91,7 @@ class ColAction extends AnyAction<INestLayoutTheme> {
     }
   }
 }
-const Col: IComponent = {
+const Col: IComponent<INestLayoutTheme> = {
   layoutType: LayoutType.Layout,
   atomType: ColType,
   action: ColAction,

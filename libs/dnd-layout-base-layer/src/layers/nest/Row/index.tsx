@@ -64,7 +64,7 @@ class RowAction extends Action {
     }
   }
 }
-const Row: IComponent = {
+const Row: IComponent<INestLayoutTheme> = {
   layoutType: LayoutType.Layout,
   atomType: RowType,
   action: RowAction,

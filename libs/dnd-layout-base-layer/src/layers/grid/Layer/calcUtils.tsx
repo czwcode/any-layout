@@ -103,11 +103,13 @@ export function createFakeNode(
   return {
     ...originNode,
     ...createFakeNodePosition(
+      // 不包含所有节点
       createMoveFakeNode(
         originNode,
         movePosition,
         getPositionParams(theme, layerWidth)
       ),
+      // 包含所有节点
       sameLevelNodes
     ),
   };

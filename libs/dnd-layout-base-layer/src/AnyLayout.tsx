@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import {
   RenderCore,
@@ -24,22 +24,34 @@ import {
   IInteractive,
   IGlobalContext,
   useGlobalContext,
+  IAtomFrameRenderer,
 } from './context/GlobalContext';
 import { getMemoWrapper } from './MemoWrapper';
+import { defaultAtomRenderer } from './utils/rendererHelp';
+import { usePrevious } from './layers/grid/Layer';
 
 export interface IAnyLayout extends IRenderCore {
   theme?: ILayoutTheme;
   active?: number | string;
+  AtomRenderer?:
+    | React.FC<IAtomFrameRenderer>
+    | React.ComponentClass<IAtomFrameRenderer>;
+  onLayoutChange?: (layout: ILayout[]) => void;
   onActive?: (active: number | string) => void;
 }
 function TravseRendererFrame(props: ITravseRendererFrame) {
   const { layoutType, layout, children, parent } = props;
   const { type, theme: currentLayoutTheme } = layout;
-  const theme = React.useContext(AnyLayoutTheme);
-  const layoutContext = React.useContext(LayerContext);
-  const size = React.useContext(SizeContext);
+  const theme = useContext(AnyLayoutTheme);
+  const layoutContext = useContext(LayerContext);
+  const size = useContext(SizeContext);
   const { active } = useGlobalContext<IGlobalContext<any>>();
   const MemoWrapper = getMemoWrapper();
+  const currentTheme =
+    layoutType === LayoutType.Layer
+      ? (theme && theme[type]) || currentLayoutTheme
+      : null;
+  const currentWidth = layoutContext ? layoutContext.width : size.width;
   return (
     <ContextProcess
       enable={
@@ -47,13 +59,12 @@ function TravseRendererFrame(props: ITravseRendererFrame) {
         layoutType === LayoutType.ContainerPanel
       }
       Ctx={LayerContext}
-      value={{
-        theme:
-          layoutType === LayoutType.Layer
-            ? (theme && theme[type]) || currentLayoutTheme
-            : null,
-        width: layoutContext ? layoutContext.width : size.width,
-      }}
+      value={React.useMemo(() => {
+        return {
+          theme: currentTheme,
+          width: currentWidth,
+        };
+      }, [currentTheme, currentWidth])}
     >
       <SizeWrapper {...props}>
         <MemoWrapper layout={layout} active={active} key={layout.id}>
@@ -70,7 +81,7 @@ export interface ISizeWrapper {
   path: number[];
   children?: React.ReactNode;
 }
-function defaultSizeProcess(options: ISizeProcess) {
+function defaultSizeProcess(options: ISizeProcess<any>) {
   const { layout, size } = options;
   const { w, h } = layout;
   const { width, height } = size;
@@ -80,26 +91,32 @@ function defaultSizeProcess(options: ISizeProcess) {
   };
 }
 const SizeWrapper = (props: ISizeWrapper) => {
-  const size = React.useContext(SizeContext);
-  const layoutContext = React.useContext(LayerContext);
+  const size = useContext(SizeContext);
+  const layoutContext = useContext(LayerContext);
   const { path, layout, children, parent } = props;
   const { type } = layout;
   // 获取组件
   const atoms = getRegist();
   const Atom = atoms[type];
   const sizeProcess = Atom.sizeProcess || defaultSizeProcess;
-  const afterProcessSize = sizeProcess({
-    layout: layout,
-    path: path,
-    theme: layoutContext && layoutContext.theme,
-    parent,
-    size,
-  });
+  const currentSize = React.useMemo(() => {
+    return sizeProcess({
+      layout: layout,
+      path: path,
+      theme: layoutContext && layoutContext.theme,
+      parent,
+      size,
+    });
+  }, [layout, path.join('.'), layoutContext, parent, size]);
+  const preSize = usePrevious(currentSize)
+  const preLayout = usePrevious(layout)
+  console.log(111, preSize ===currentSize)
+  console.log(2222, preLayout ===layout)
   return (
     <ContextProcess
       enable={true}
       Ctx={SizeContext}
-      value={{ ...afterProcessSize, type } as any}
+      value={currentSize}
     >
       {children}
     </ContextProcess>
@@ -107,7 +124,13 @@ const SizeWrapper = (props: ISizeWrapper) => {
 };
 
 export function AnyLayout(props: IAnyLayout) {
-  const { layout, active, theme = defaultTheme, onActive } = props;
+  const {
+    layout,
+    active,
+    theme = defaultTheme,
+    AtomRenderer,
+    onActive,
+  } = props;
   const interactiveCoreRef = React.useRef(new InteractiveCore(layout));
   const [storeLayout, setStoreLayout] = React.useState(null);
   React.useEffect(() => {
@@ -131,12 +154,18 @@ export function AnyLayout(props: IAnyLayout) {
         setActiveStatePath(path);
       },
     });
+    console.log('hahah');
     return {
       interact: interact,
-      active: getActivePath(),
+      active: 111,
       layer: layer,
+      AtomRenderer: AtomRenderer || defaultAtomRenderer,
     };
-  }, [onActive, getActivePath()]);
+  }, [AtomRenderer, layout]);
+  const preglobalContext = usePrevious(globalContext)
+  const preLayout = usePrevious(layout)
+  console.log("preglobalContext", preglobalContext ===globalContext)
+  console.log("preLayout", preLayout ===layout)
   return (
     <GlobalContext.Provider value={globalContext}>
       <AnyLayoutTheme.Provider value={theme}>

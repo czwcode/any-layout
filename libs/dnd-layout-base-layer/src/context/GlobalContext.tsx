@@ -1,6 +1,6 @@
-import React from 'react';
-import { MutableRefObject, createContext } from "react";
-import { InteractiveCore, ILayout} from 'dnd-layout-renderer'
+import React, { useContext,createContext} from 'react';
+import { MutableRefObject} from "react";
+import { InteractiveCore, ILayout, INode} from 'dnd-layout-renderer'
 import { IAnyDropOptions } from '../actions';
 import { IAnySizeOptions } from '../types/layout';
 import { IAnyLayoutTheme, useLayerContext } from './layerContext';
@@ -64,16 +64,21 @@ export function createMutators(options: ICreateMutators): IInteractive<IAnyLayou
     },
   };
 }
-
+export interface IAtomFrameRenderer {
+  node: INode;
+  width: number;
+  height: number;
+}
 
 export interface IGlobalContext<ITheme> {
   interact: IInteractive<ITheme>;
   active: string | number
+  AtomRenderer: React.FC<IAtomFrameRenderer> |React.ComponentClass<IAtomFrameRenderer>
   layer: React.MutableRefObject<HTMLDivElement>
 }
 export function useGlobalContext<T>() {
   const layerContext  =useLayerContext()
-  const globalContext = React.useContext(GlobalContext) as any as IGlobalContext<T>
+  const globalContext = useContext(GlobalContext) as any as IGlobalContext<T>
   const { interact} = globalContext
   const { onDrop, onSizeChange, onMove } = interact
   return {

@@ -12,6 +12,7 @@ import { toReal, toVirtual } from '../../../utils/calcWidth';
 import {
   IGridLayoutTheme,
   useLayerContext,
+  INestLayoutTheme,
 } from '../../../context/layerContext';
 import { useAnyLayoutDrop } from '../../../hooks/useAnyDrop';
 import { IAnyDropOptions, AnyAction } from '../../../actions';
@@ -62,7 +63,7 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     );
     relayoutNodes(
       newDragNode,
-      node.children.filter((item) => item.id !== dragNode.id)
+      node.children
     );
   }
   onDrag() {}
@@ -81,30 +82,24 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     } = options;
     const theme = layerContext.theme;
     const node = this.getNode();
-    relayoutNodes(
-      createMoveFakeNode(
-        data,
-        node.children,
-        theme,
-        layerContext.width,
-        originMouseClientOffset,
-        mouseClientOffset
-      ),
-      this.getNode().children
-    );
+    const validNodes = node.children.filter(item => item.id !== data.id)
     const fakeNode = createMoveFakeNode(
       data,
-      node.children,
+      validNodes,
       theme,
       size.width,
       originMouseClientOffset,
       mouseClientOffset
     );
+    relayoutNodes(
+      fakeNode,
+      node.children
+    );
+   
     data.x = fakeNode.x;
     data.y = fakeNode.y;
     const lastPath = dragPath[dragPath.length - 1];
-    console.log("dropInfo", this.getNode().children.length, lastPath, data)
-    this.getNode().children.splice(lastPath, 0, data);
+    this.getNode().children.splice(lastPath, 1, data);
   }
   onMove(
     dragPath: number[],
@@ -119,21 +114,23 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     } = options;
     const theme = layerContext.theme;
     const node = this.getNode();
+    const validNodes = node.children.filter(item => item.id !== data.id)
+    const fakeNode = createMoveFakeNode(
+      data,
+      validNodes,
+      theme,
+      layerContext.width,
+      originMouseClientOffset,
+      mouseClientOffset
+    )
     relayoutNodes(
-      createMoveFakeNode(
-        data,
-        node.children,
-        theme,
-        layerContext.width,
-        originMouseClientOffset,
-        mouseClientOffset
-      ),
-      node.children
+      fakeNode,
+      validNodes
     );
   }
 }
 
-const GridLayer: IComponent = {
+const GridLayer: IComponent<INestLayoutTheme> = {
   layoutType: LayoutType.Layer,
   atomType: GridLayerType,
   action: RowAction,
@@ -154,7 +151,7 @@ const GridLayer: IComponent = {
       path,
       onHover: (dragPath, path, options) => {
         const { data, originMouseClientOffset, mouseClientOffset } = options;
-
+        console.log("++++++onHover")
         if (!position) {
           setPosition({
             data: data,
@@ -176,15 +173,15 @@ const GridLayer: IComponent = {
             setPosition({
               data: fakeNode,
             });
-            
+
             onMove(dragPath, path, options);
           }
         }
       },
       onDrop: (dragPath, path, options) => {
         setPosition(null);
-        console.log('options: ', options);
         onDrop(dragPath, path, options);
+        console.log("++++++ondrop")
       },
     });
     // placeholder的大小
@@ -203,7 +200,9 @@ const GridLayer: IComponent = {
         }}
       >
         {props.children}
-        {position && position.data && <FakeNodePlaceHolder layout={position.data} />}
+        {position && position.data && (
+          <FakeNodePlaceHolder layout={position.data} />
+        )}
       </div>
     );
   },

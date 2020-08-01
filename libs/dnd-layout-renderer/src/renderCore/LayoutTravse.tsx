@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
 import { ILayout, INode } from '../types';
 import { getRegist, IComponentRender } from '../register';
 import { getMemoWrapper } from '../../../dnd-layout-base-layer/src/MemoWrapper';
@@ -8,21 +8,18 @@ import {
   ITravseRendererFrame,
   ILayoutTravseContext,
 } from '../context/LayoutTravseContext';
-
-export interface IAtomFrameRenderer {
-  node: INode;
-  width: number;
-  height: number;
-}
+import { SizeContext } from '../context/sizeContext';
 
 interface ILayoutTravse extends ILayoutTravseContext {
   layout?: ILayout[];
+  width: number;
 }
 
 export function LayoutTravse(props: ILayoutTravse) {
   const {
     layout,
     transformProps,
+    width,
     TravseRendererFrame = DefaultTravseRendererFrame,
   } = props;
   // 可以防止transformProps和TravseRendererFrame没变化造成的重复渲染
@@ -34,10 +31,19 @@ export function LayoutTravse(props: ILayoutTravse) {
   }, [transformProps, TravseRendererFrame]);
   return (
     <LayoutTravseContext.Provider value={layoutTravseContextValue}>
-      <TreeTravse<ILayout>
-        TreeTravseRenderer={LayoutTreeTravseRenderer}
-        dataSource={layout}
-      />
+      <SizeContext.Provider
+        value={useMemo(() => {
+          return {
+            width,
+            height: null,
+          };
+        }, [width])}
+      >
+        <TreeTravse<ILayout>
+          TreeTravseRenderer={LayoutTreeTravseRenderer}
+          dataSource={layout}
+        />
+      </SizeContext.Provider>
     </LayoutTravseContext.Provider>
   );
 }

@@ -1,4 +1,4 @@
-import React, { Context, useContext } from 'react';
+import React, { useContext, Context } from 'react';
 
 export interface IContextProcess<T> {
   Ctx: Context<T>;
@@ -11,7 +11,7 @@ export default function ContextProcess<T>(props: IContextProcess<T>) {
   const { enable, Ctx, children, value } = props;
   if (enable) {
     const contextValue = useContext(Ctx)
-    return <Ctx.Provider value={value || contextValue}>{children}</Ctx.Provider>;
+    return <Ctx.Provider value={value || contextValue as any}>{children}</Ctx.Provider>;
   } else {
     return <>{children}</>;
   }

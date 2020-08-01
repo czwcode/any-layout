@@ -21,7 +21,7 @@ export function TreeTravse<T extends { children?: TreeData<T>[] }>(
     TreeTravseRenderer,
     path = [],
     parent,
-    getKey = (data: any, path) => data.id+'--'+path.join('.'),
+    getKey = (data: any, path) => data.id //+'--'+path.join('.'),
   } = props;
   return (
     <>

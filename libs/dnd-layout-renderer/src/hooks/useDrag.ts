@@ -20,7 +20,9 @@ export interface DragInfo {
   layerType: LayerType;
   data: ILayout;
 }
-export function useLayoutDrag<T>(config: IDragConfig): [
+export function useLayoutDrag<T>(
+  config: IDragConfig
+): [
   { isDragging: boolean },
   React.MutableRefObject<T>,
   DragElementWrapper<DragSourceOptions>,

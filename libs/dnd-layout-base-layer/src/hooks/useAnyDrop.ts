@@ -12,7 +12,7 @@ export interface IAnyDropOptions extends DropOptions {
 export function useAnyLayoutDrop<T extends HTMLDivElement>(
   dropProps: IDropConfig<IAnyDropOptions>
 ) {
-  const theme = React.useContext(LayerContext);
+  const theme = React.useContext<any>(LayerContext);
   return useLayoutDrop<T>({
     ...dropProps,
     onDrop: (dragPath, dropPath, options) => {

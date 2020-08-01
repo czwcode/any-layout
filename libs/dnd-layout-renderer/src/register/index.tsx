@@ -2,24 +2,19 @@ import React from 'react';
 import {
   ILayout,
   Action,
-  DragDirection,
   LayoutType,
-  ISizeOptions,
 } from '../types';
-import { DropOptions } from '../hooks/useDrop';
-import { IAtomFrameRenderer } from '../renderCore/LayoutTravse';
 
 export interface IComponentRender {
   layout: ILayout;
   path: number[];
-  atomFrameRenderer: (props: IAtomFrameRenderer) => React.ReactNode;
   children?: React.ReactNode;
 }
-export interface IComponent {
+export interface IComponent<T> {
   layoutType: LayoutType;
   atomType: string;
   action?: typeof Action;
-  sizeProcess?: (config: ISizeProcess) => ISize;
+  sizeProcess?: (config: ISizeProcess<T>) => ISize;
   renderer: React.ComponentClass<IComponentRender> | React.FC<IComponentRender>;
 }
 
@@ -27,15 +22,15 @@ export interface ISize {
   width?: number;
   height?: number;
 }
-export interface ISizeProcess {
+export interface ISizeProcess<ITheme> {
   layout: ILayout;
   parent: ILayout;
   path: number[];
   size: ISize;
-  theme: any;
+  theme: ITheme;
 }
 const __ATOMS__ = {} as {
-  [key: string]: IComponent;
+  [key: string]: IComponent<any>;
 };
 
 /**
@@ -44,7 +39,7 @@ const __ATOMS__ = {} as {
  * @export
  * @param {IComponent} atom
  */
-export function regist(atom: IComponent) {
+export function regist(atom: IComponent<any>) {
   const atomType = atom.atomType;
   __ATOMS__[atomType] = atom;
 }
