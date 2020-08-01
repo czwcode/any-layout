@@ -37,11 +37,34 @@ export interface IDropReturnInfo {
   isOver: boolean;
   canDrop: boolean;
 }
+
+const throttle = (func, limit) => {
+  let lastFunc
+  let lastRan
+  return function() {
+    // @ts-ignore
+    const context = this as any
+    const args = arguments
+    if (!lastRan) {
+      func.apply(context, args)
+      lastRan = Date.now()
+    } else {
+      clearTimeout(lastFunc)
+      lastFunc = setTimeout(function() {
+        if ((Date.now() - lastRan) >= limit) {
+          func.apply(context, args)
+          lastRan = Date.now()
+        }
+      }, limit - (Date.now() - lastRan))
+    }
+  }
+}
 export const useLayoutDrop = <T extends HTMLElement>(
   config: IDropConfig<DropOptions>
 ) => {
   const ref = React.useRef<T>(null);
-  const { onHover, path, accept = DragDropType.Widget, onDrop } = config;
+  let { onHover = () => {}, path, accept = DragDropType.Widget, onDrop } = config;
+  onHover =  throttle(onHover, 100)
   const positionInfo = React.useRef(null);
   const size = React.useContext(SizeContext);
   const [collectionDropProps, drop] = useDrop<DragInfo, null, IDropReturnInfo>({
@@ -87,12 +110,12 @@ export const useLayoutDrop = <T extends HTMLElement>(
           data: JSON.parse(JSON.stringify(item.data)),
           size,
           mouseClientOffset: clientOffset,
-          dropBoundingRect: ref.current.getBoundingClientRect(),
+          // dropBoundingRect: ref.current.getBoundingClientRect(),
           originMouseClientOffset: {
             x: positionInfo.current.originMouseX,
             y: positionInfo.current.originMouseY,
           },
-        });
+        } as any);
     },
   });
   drop(ref);

@@ -86,13 +86,13 @@ const EditContainer = {
       size.width,
       recordStartDragNode.current
     );
-    console.log("dddddddd=====", layout.id)
     return (
       <>
         <div
           style={{
-            left: left,
-            top: top,
+            // left: left,
+            // top: top,
+            transform: `translate(${left}px, ${top}px)`,
             width: temporaryNode ? originPosition.width + temporaryNode.x :  width,
             height: temporaryNode? originPosition.height + temporaryNode.y :  height,
             transition: 'all 200ms ease',

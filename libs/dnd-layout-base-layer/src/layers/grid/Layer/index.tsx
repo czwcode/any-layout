@@ -19,14 +19,10 @@ import {
   getBoundingRect,
   relayoutNodes,
   createFakeNode as createMoveFakeNode,
-  setDragSize,
   createSizeFakeNode,
-  getPositionParams,
 } from './calcUtils';
-import { calcMovePosition } from '../../../utils/calcPosition';
 import { IAnySizeOptions } from '../../../types/layout';
 import { useGlobalContext } from '../../../context/GlobalContext';
-import { throttle } from '../../../utils/base';
 export const GridLayerType = 'gridLayer';
 export function usePrevious<T>(value: T) {
   const ref = React.useRef<T>();
@@ -75,7 +71,7 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     dropPath: number[],
     options: IAnyDropOptions<IGridLayoutTheme>
   ) {
-    const lastPath = dragPath[dragPath.length - 1];
+    
     const {
       data,
       originMouseClientOffset,
@@ -106,6 +102,8 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     );
     data.x = fakeNode.x;
     data.y = fakeNode.y;
+    const lastPath = dragPath[dragPath.length - 1];
+    console.log("dropInfo", this.getNode().children.length, lastPath, data)
     this.getNode().children.splice(lastPath, 0, data);
   }
   onMove(
@@ -118,7 +116,6 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
       originMouseClientOffset,
       mouseClientOffset,
       layerContext,
-      size,
     } = options;
     const theme = layerContext.theme;
     const node = this.getNode();
@@ -145,9 +142,7 @@ const GridLayer: IComponent = {
     const size = React.useContext(SizeContext);
     const { layout, path } = props;
     const { interact } = useGlobalContext<IGridLayoutTheme>();
-    console.log("dddddddd=====", layout.id)
     let { onMove, onDrop } = interact;
-    onMove = throttle(onMove, 100)
     const [position, setPosition] = React.useState<{
       data: ILayout;
     }>(null);
@@ -181,12 +176,14 @@ const GridLayer: IComponent = {
             setPosition({
               data: fakeNode,
             });
+            
             onMove(dragPath, path, options);
           }
         }
       },
       onDrop: (dragPath, path, options) => {
         setPosition(null);
+        console.log('options: ', options);
         onDrop(dragPath, path, options);
       },
     });
@@ -206,7 +203,7 @@ const GridLayer: IComponent = {
         }}
       >
         {props.children}
-        {position && <FakeNodePlaceHolder layout={position.data} />}
+        {position && position.data && <FakeNodePlaceHolder layout={position.data} />}
       </div>
     );
   },

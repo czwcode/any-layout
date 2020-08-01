@@ -10,7 +10,7 @@ export interface ITreeTravse<T> {
   TreeTravseRenderer: (props: ITreeTravseRenderer<T>) => JSX.Element;
   dataSource: TreeData<T>[];
   path?: number[];
-  getKey?: (data: T) => number | string;
+  getKey?: (data: T, path: number[]) => number | string;
   parent?: TreeData<T>;
 }
 export function TreeTravse<T extends { children?: TreeData<T>[] }>(
@@ -21,7 +21,7 @@ export function TreeTravse<T extends { children?: TreeData<T>[] }>(
     TreeTravseRenderer,
     path = [],
     parent,
-    getKey = (data: any) => data.id,
+    getKey = (data: any, path) => data.id+'--'+path.join('.'),
   } = props;
   return (
     <>
@@ -29,7 +29,7 @@ export function TreeTravse<T extends { children?: TreeData<T>[] }>(
         const currentPath = [...path, index];
         return (
           <TreeTravseRenderer
-            key={getKey(currentLayout)}
+            key={getKey(currentLayout, currentPath)}
             parent={parent}
             path={currentPath}
             node={currentLayout}

@@ -43,10 +43,10 @@ export function RenderCore(props: IRenderCore) {
         </SizeMe>
       )}
 
-      <DragLayer
+      {/* <DragLayer
         DragBoxRenderer={DragBoxRenderer}
         layerRef={layerRef.current}
-      />
+      /> */}
     </div>
   );
 }
