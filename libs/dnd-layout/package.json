@@ -23,7 +23,6 @@
     "eslint": "eslint 'src/**/*.@(js|jsx)' --fix",
     "build-lib": "tsc -p ./tsconfig.build.json",
     "watch": "tsc -w -p ./tsconfig.build.json",
-    "doc": "typedoc --out ./src/index.tsx ./doc/",
     "precommit": "lint-staged"
   },
   "lint-staged": {
