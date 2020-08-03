@@ -12,11 +12,6 @@ export default {
 export const RenderCoreTest = () => {
   return (
     <DndProvider backend={HTML5Backend}>
-      <DragFrame
-        data={{
-          type: 'nestAtom',
-        }}
-      >1111</DragFrame>
       <AnyLayout
         onLayoutChange={() => {}}
         layout={[

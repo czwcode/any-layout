@@ -18,9 +18,11 @@ import {
   useLayerContext,
 } from '../../../context/layerContext';
 import { IAnySizeOptions } from '../../../types/layout';
+import uuid from 'uuid';
 export const RowType = 'row';
 export function getRowNode(data: ILayout) {
   return {
+    id: uuid(),
     type: RowType,
     children: [getColNode(24, data)],
   } as ILayout;

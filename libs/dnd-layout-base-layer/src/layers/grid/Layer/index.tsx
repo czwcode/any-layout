@@ -19,7 +19,7 @@ import { IAnyDropOptions, AnyAction } from '../../../actions';
 import {
   getBoundingRect,
   relayoutNodes,
-  createFakeNode as createMoveFakeNode,
+  createFakeNode,
   createSizeFakeNode,
 } from './calcUtils';
 import { IAnySizeOptions } from '../../../types/layout';
@@ -61,10 +61,7 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
       JSON.parse(JSON.stringify(dragNode)),
       options
     );
-    relayoutNodes(
-      newDragNode,
-      node.children
-    );
+    relayoutNodes(newDragNode, node.children);
   }
   onDrag() {}
   onDrop(
@@ -72,7 +69,6 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     dropPath: number[],
     options: IAnyDropOptions<IGridLayoutTheme>
   ) {
-    
     const {
       data,
       originMouseClientOffset,
@@ -82,8 +78,8 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     } = options;
     const theme = layerContext.theme;
     const node = this.getNode();
-    const validNodes = node.children.filter(item => item.id !== data.id)
-    const fakeNode = createMoveFakeNode(
+    const validNodes = node.children.filter((item) => item.id !== data.id);
+    const fakeNode = createFakeNode(
       data,
       validNodes,
       theme,
@@ -91,15 +87,12 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
       originMouseClientOffset,
       mouseClientOffset
     );
-    relayoutNodes(
-      fakeNode,
-      node.children
-    );
-   
+    relayoutNodes(fakeNode, node.children);
+
     data.x = fakeNode.x;
     data.y = fakeNode.y;
     const lastPath = dragPath[dragPath.length - 1];
-    this.getNode().children.splice(lastPath, 1, data);
+    this.getNode().children.splice(lastPath, 0, data);
   }
   onMove(
     dragPath: number[],
@@ -114,19 +107,16 @@ class RowAction extends AnyAction<IGridLayoutTheme> {
     } = options;
     const theme = layerContext.theme;
     const node = this.getNode();
-    const validNodes = node.children.filter(item => item.id !== data.id)
-    const fakeNode = createMoveFakeNode(
+    const validNodes = node.children.filter((item) => item.id !== data.id);
+    const fakeNode = createFakeNode(
       data,
       validNodes,
       theme,
       layerContext.width,
       originMouseClientOffset,
       mouseClientOffset
-    )
-    relayoutNodes(
-      fakeNode,
-      validNodes
     );
+    relayoutNodes(fakeNode, validNodes);
   }
 }
 
@@ -137,6 +127,7 @@ const GridLayer: IComponent<INestLayoutTheme> = {
   renderer: (props: IComponentRender) => {
     const { theme } = useLayerContext<IGridLayoutTheme>();
     const size = React.useContext(SizeContext);
+    const placeholderRef = React.useRef<HTMLDivElement>(null);
     const { layout, path } = props;
     const { interact } = useGlobalContext<IGridLayoutTheme>();
     let { onMove, onDrop } = interact;
@@ -151,13 +142,12 @@ const GridLayer: IComponent<INestLayoutTheme> = {
       path,
       onHover: (dragPath, path, options) => {
         const { data, originMouseClientOffset, mouseClientOffset } = options;
-        console.log("++++++onHover")
         if (!position) {
           setPosition({
             data: data,
           });
         } else {
-          const fakeNode = createMoveFakeNode(
+          const fakeNode = createFakeNode(
             data,
             layout.children,
             theme,
@@ -181,7 +171,6 @@ const GridLayer: IComponent<INestLayoutTheme> = {
       onDrop: (dragPath, path, options) => {
         setPosition(null);
         onDrop(dragPath, path, options);
-        console.log("++++++ondrop")
       },
     });
     // placeholder的大小
@@ -225,6 +214,7 @@ export function FakeNodePlaceHolder(props: IPlaceHolder) {
         background: 'pink',
         position: 'absolute',
         opacity: 0.3,
+        zIndex: 10,
         transition: 'all 200ms ease',
         width,
         height,

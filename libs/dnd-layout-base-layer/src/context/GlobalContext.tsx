@@ -77,21 +77,23 @@ export interface IGlobalContext<ITheme> {
   layer: React.MutableRefObject<HTMLDivElement>
 }
 export function useGlobalContext<T>() {
-  const layerContext  =useLayerContext()
+  const layerContext  =useLayerContext<T>()
   const globalContext = useContext(GlobalContext) as any as IGlobalContext<T>
   const { interact} = globalContext
   const { onDrop, onSizeChange, onMove } = interact
-  return {
-    ...globalContext,
-    interact: {
-      ...interact,
-      onDrop: (dragPath, dropPath, options) => {
-        onDrop(dragPath, dropPath, {
-          ...options,
-          layerContext
-        })
+  return React.useMemo< IGlobalContext<T>>(() => {
+    return {
+      ...globalContext,
+      interact: {
+        ...interact,
+        onDrop: (dragPath, dropPath, options) => {
+          onDrop(dragPath, dropPath, {
+            ...options,
+            layerContext
+          })
+        }
       }
     }
-  }
+  }, [layerContext, globalContext])
 }
 export const GlobalContext = createContext<IGlobalContext<IAnyLayoutTheme>>(null);

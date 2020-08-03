@@ -30,12 +30,7 @@ function FCTest(props: T) {
   // const b = usePrevious(a);
   // console.log(a === b);
   console.log('render', a);
-  return (
-    <div>
-      {' '}
-        ----FCTest---{props.a}
-    </div>
-  );
+  return <div> ----FCTest---{props.a}</div>;
 }
 
 function FCTest2(props: T) {
@@ -95,3 +90,27 @@ export function T() {
 
 const a = createContext<string>(null);
 const b = createContext<string>(null);
+
+export const testRemove = () => {
+  const data = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }];
+  const [state, setState] = useState(data);
+  return (
+    <div>
+      <button
+        onClick={() => {
+          // setState(state.slice(0, state.length - 1));
+          setState(state.slice(0));
+        }}
+      >
+        移除数据第一个元素
+      </button>
+      {state.map((item, index) => (
+        <Item key={item.id} {...item}/>
+      ))}
+    </div>
+  );
+};
+const Item = (props: { id: any }) => {
+  console.log("render", props.id)
+  return <div>{props.id}</div>;
+};

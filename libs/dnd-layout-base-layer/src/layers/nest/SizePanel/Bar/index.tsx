@@ -154,7 +154,7 @@ class Bar extends Component<BarProps> {
 
   render() {
     const { simple, prefix, offsetX, offsetY, isActive, position } = this.props;
-    let style = {} as React.CSSProperties;
+    let style = { zIndex: 10} as React.CSSProperties;
     if (isActive) {
       style.transform = `translate(${offsetX}px, ${offsetY}px)`;
     }

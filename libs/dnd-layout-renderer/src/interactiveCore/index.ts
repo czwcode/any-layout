@@ -1,6 +1,5 @@
 import {
   ILayout,
-  DragDirection,
   getActionInstance,
   ISizeOptions,
 } from '../types';

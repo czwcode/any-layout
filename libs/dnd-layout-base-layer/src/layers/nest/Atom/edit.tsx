@@ -50,7 +50,6 @@ class AtomAction extends Action {
     } = options;
     const direction = calcDirection(dropBoundingRect, clientOffset);
     const node = this.getNode();
-    const parent = this.getParent();
     const parentAction = this.getParentAction();
     if (
       direction === HoverDirection.TOP ||
@@ -84,7 +83,7 @@ class AtomAction extends Action {
     const parent = this.getParent();
     const grandParent = this.getGrandParent();
     const parentAction = this.getParentAction();
-    if (direction === DragDirection.BOTTOM) {
+    if (direction === DragDirection.Bottom) {
       grandParent.children.forEach((child, index) => {
         if (child !== parent) {
           child.children.forEach((current) => {

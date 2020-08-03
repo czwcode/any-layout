@@ -6,7 +6,6 @@ import {
   ISizeContext,
   SizeContext,
 } from 'dnd-layout-renderer';
-import { defaultAtomRenderer } from '../../../utils/rendererHelp';
 import {
   INestLayoutTheme,
   LayerContext,
@@ -19,7 +18,7 @@ const Widget: IComponent<INestLayoutTheme> = {
   layoutType: LayoutType.Atom,
   atomType: AtomType,
   sizeProcess: (config) => {
-    const { layout, path, size, theme, parent } = config;
+    const { layout, path, size, theme } = config;
     const lastPath = path[path.length - 1];
     const { width } = size;
     return {

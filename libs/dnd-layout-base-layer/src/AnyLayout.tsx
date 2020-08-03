@@ -40,7 +40,7 @@ export interface IAnyLayout extends IRenderCore {
   onActive?: (active: number | string) => void;
 }
 function TravseRendererFrame(props: ITravseRendererFrame) {
-  const { layoutType, layout, children, parent } = props;
+  const { layoutType, layout, children, parent, path } = props;
   const { type, theme: currentLayoutTheme } = layout;
   const theme = useContext(AnyLayoutTheme);
   const layoutContext = useContext(LayerContext);
@@ -67,7 +67,7 @@ function TravseRendererFrame(props: ITravseRendererFrame) {
       }, [currentTheme, currentWidth])}
     >
       <SizeWrapper {...props}>
-        <MemoWrapper layout={layout} active={active} key={layout.id}>
+        <MemoWrapper layout={layout} active={active} path={path} key={layout.id}>
           {children}
         </MemoWrapper>
       </SizeWrapper>
@@ -99,25 +99,18 @@ const SizeWrapper = (props: ISizeWrapper) => {
   const atoms = getRegist();
   const Atom = atoms[type];
   const sizeProcess = Atom.sizeProcess || defaultSizeProcess;
-  const currentSize = React.useMemo(() => {
-    return sizeProcess({
-      layout: layout,
-      path: path,
-      theme: layoutContext && layoutContext.theme,
-      parent,
-      size,
-    });
-  }, [layout, path.join('.'), layoutContext, parent, size]);
-  const preSize = usePrevious(currentSize)
-  const preLayout = usePrevious(layout)
-  console.log(111, preSize ===currentSize)
-  console.log(2222, preLayout ===layout)
+  const afterProcessSize = sizeProcess({
+    layout: layout,
+    path: path,
+    theme: layoutContext && layoutContext.theme,
+    parent,
+    size,
+  });
+  const memoSize = React.useMemo(() => {
+    return afterProcessSize;
+  }, [afterProcessSize.width, afterProcessSize.height]);
   return (
-    <ContextProcess
-      enable={true}
-      Ctx={SizeContext}
-      value={currentSize}
-    >
+    <ContextProcess enable={true} Ctx={SizeContext} value={memoSize}>
       {children}
     </ContextProcess>
   );
@@ -154,18 +147,13 @@ export function AnyLayout(props: IAnyLayout) {
         setActiveStatePath(path);
       },
     });
-    console.log('hahah');
     return {
       interact: interact,
-      active: 111,
+      active: getActivePath(),
       layer: layer,
       AtomRenderer: AtomRenderer || defaultAtomRenderer,
     };
-  }, [AtomRenderer, layout]);
-  const preglobalContext = usePrevious(globalContext)
-  const preLayout = usePrevious(layout)
-  console.log("preglobalContext", preglobalContext ===globalContext)
-  console.log("preLayout", preLayout ===layout)
+  }, [AtomRenderer, layout, getActivePath()]);
   return (
     <GlobalContext.Provider value={globalContext}>
       <AnyLayoutTheme.Provider value={theme}>

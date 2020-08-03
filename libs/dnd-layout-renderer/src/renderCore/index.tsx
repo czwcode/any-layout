@@ -11,7 +11,7 @@ export * from '../context/LayoutTravseContext';
 export function RenderCore(props: IRenderCore) {
   const { layout, withRef, DragBoxRenderer } = props;
   const layerRef = useRef<HTMLDivElement>(null);
-  withRef.current = layerRef.current;
+  withRef && (withRef.current = layerRef.current)
   return (
     <div
       className='render-core-wrapper'
@@ -25,7 +25,6 @@ export function RenderCore(props: IRenderCore) {
         <SizeMe>
           {({ size }) => {
             const { width = 0 } = size;
-            console.log('props: ', props);
           
             return (
               <div className='render-core'>

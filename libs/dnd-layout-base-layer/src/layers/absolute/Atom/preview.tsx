@@ -15,7 +15,6 @@ const Widget: IComponent<any> = {
     const { layout } = props;
     const size = React.useContext(SizeContext);
     const { width, height } = size;
-    console.log('width: ', width);
     return (
       <div
         className='absolute-atom'

@@ -40,13 +40,13 @@ class AtomAction extends AnyAction<any> {
     );
     const node = this.getNode();
     switch (direction) {
-      case DragDirection.BOTTOM:
+      case DragDirection.Bottom:
         node.h = y + node.h;
         break;
-      case DragDirection.LEFT:
+      case DragDirection.Left:
         node.w = x + node.w;
         break;
-      case DragDirection.RIGHT:
+      case DragDirection.Right:
         node.w = x + node.w;
         break;
 

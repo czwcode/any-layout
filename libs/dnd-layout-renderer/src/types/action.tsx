@@ -1,6 +1,6 @@
 import { INode, ILayout } from './layout';
 import { getRegist } from '../register';
-import {  DropOptions, BaseDndOptions } from '../hooks/useDrop';
+import { DropOptions, BaseDndOptions } from '../hooks/useDrop';
 import TreeSolver from '../interactiveCore/TreeSolver';
 
 export interface Position {
@@ -9,10 +9,10 @@ export interface Position {
 }
 
 export enum DragDirection {
-  LEFT = 'left',
-  RIGHT = 'right',
-  BOTTOM = 'bottom',
-  TOP = 'top',
+  Left = 'left',
+  Right = 'right',
+  Bottom = 'bottom',
+  Top = 'top',
 }
 
 export interface ISizeOptions extends BaseDndOptions {
@@ -84,7 +84,7 @@ export abstract class Action implements BaseAction, IAction {
     this.index = params.path[params.path.length - 1];
   }
   onSizeChanging(path: number[], sizeOptions: ISizeOptions): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   /**

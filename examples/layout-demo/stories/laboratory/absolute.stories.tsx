@@ -1,5 +1,5 @@
 import React from 'react';
-import { RenderCore, DragFrame } from 'dnd-layout';
+import {  DragFrame, AnyLayout } from 'dnd-layout';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 export default {
@@ -12,12 +12,7 @@ export default {
 export const RenderCoreTest = () => {
   return (
     <DndProvider backend={HTML5Backend}>
-      <DragFrame
-        data={{
-          type: 'nestAtom',
-        }}
-      >1111</DragFrame>
-      <RenderCore
+      <AnyLayout
         onLayoutChange={() => {}}
         layout={[
           {

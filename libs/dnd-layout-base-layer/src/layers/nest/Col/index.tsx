@@ -22,9 +22,11 @@ import {
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { IAnySizeOptions } from '../../../types/layout';
 import { AnyAction } from '../../../actions';
+import uuid from 'uuid';
 export const ColType = 'col';
 export function getColNode(w: number, data: ILayout) {
   return {
+    id: uuid(),
     type: ColType,
     w: w,
     children: [data],
@@ -82,7 +84,7 @@ class ColAction extends AnyAction<INestLayoutTheme> {
     const node = this.getNode();
     const preSibling = this.getPreviousSibling();
     const nextSibling = this.getNextSibling();
-    if (direction === DragDirection.LEFT) {
+    if (direction === DragDirection.Left) {
       node.w = node.w - x;
       preSibling.w = preSibling.w + x;
     } else {

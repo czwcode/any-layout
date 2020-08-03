@@ -14,6 +14,7 @@ export interface DragPaneWrapperProps {
   path: number[];
   realTimeChange?: boolean
   onStartSizeChange?: () => void;
+  onSizeChangeEnd?: () => void;
   onSizeChange?: (options: ISizeOptions) => void;
   onSizeChanging?: (options: ISizeOptions) => void;
   parent?: ILayout;
@@ -33,7 +34,7 @@ export interface DragPaneWrapperState {
 }
 // export default () => <div />
 export default function DragPaneWrapper(props: DragPaneWrapperProps) {
-  const { parent, path,realTimeChange = false, onSizeChange, onSizeChanging, onStartSizeChange, layer, widgetLayer } = props;
+  const { parent, path,realTimeChange = false, onSizeChange, onSizeChanging, onSizeChangeEnd, onStartSizeChange: onSizeChangeStart, layer, widgetLayer } = props;
   const deltaRef = useRef<{ deltaX: number; deltaY: number }>({
     deltaX: 0,
     deltaY: 0,
@@ -67,7 +68,7 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
   ) => {
     const x = event.clientX;
     const y = event.clientY;
-    onStartSizeChange && onStartSizeChange()
+    onSizeChangeStart && onSizeChangeStart()
     setDragPaneWrapperState((dragPaneWrapperState) => {
       return produce(
         dragPaneWrapperState,

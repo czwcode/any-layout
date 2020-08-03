@@ -12,19 +12,19 @@ import { toVirtual } from '../../../utils/calcWidth';
 import { IAnySizeOptions } from '../../../types/layout';
 export function setDragSize(direction: DragDirection, dragNode: INode, x, y) {
   switch (direction) {
-    case DragDirection.BOTTOM:
+    case DragDirection.Bottom:
       dragNode.h = y + dragNode.h;
       break;
-    case DragDirection.LEFT:
+    case DragDirection.Left:
       dragNode.w = x + dragNode.w;
       break;
-    case DragDirection.RIGHT:
+    case DragDirection.Right:
       dragNode.w = x + dragNode.w;
       break;
     default:
       break;
   }
-  return dragNode
+  return dragNode;
 }
 export function createSizeFakeNode(
   dragNode: INode,
@@ -35,7 +35,7 @@ export function createSizeFakeNode(
     mouseClientOffset,
     originMouseClientOffset,
     layerContext,
-    originNode
+    originNode,
   } = options;
   const { width, theme } = layerContext;
   const movePosition = calcMovePosition(
@@ -47,9 +47,14 @@ export function createSizeFakeNode(
     getPositionParams(theme, width),
     width
   );
-  const newNode = setDragSize(direction, JSON.parse(JSON.stringify(originNode)) , x, y);
-  dragNode.w = newNode.w
-  dragNode.h = newNode.h
+  const newNode = setDragSize(
+    direction,
+    JSON.parse(JSON.stringify(originNode)),
+    x,
+    y
+  );
+  dragNode.w = newNode.w;
+  dragNode.h = newNode.h;
   return dragNode;
 }
 export function createSizeFakePosition(
@@ -197,6 +202,7 @@ export type IRelayoutOptions = BaseDndOptions & {
  * @param {AnyDropOptions} options
  */
 export function relayoutNodes(fakeNode: INode, children: ILayout[]) {
+  
   // 生成真实假节点的位置
   const newNodes = sortNodes(children);
   layoutNodes(newNodes, fakeNode);
@@ -248,13 +254,13 @@ function compact(nodes: INode[]) {
  */
 function compactItem(node: INode, nodes: INode[]) {
   const { x, y, w, h } = node;
-  const othersNode = nodes.filter(item => item.id !== node.id)
+  const othersNode = nodes.filter((item) => item.id !== node.id);
   // 找到当前节点上方的节点
   const range = [x, x + w] as any;
-  const upperNodes = othersNode.filter(item => {
-    const itemRange = [item.x, item.x + item.w] as any
-    return isIntersect(itemRange, range) && y > item.y
-  })
+  const upperNodes = othersNode.filter((item) => {
+    const itemRange = [item.x, item.x + item.w] as any;
+    return isIntersect(itemRange, range) && y > item.y;
+  });
   const maxY = upperNodes.reduce((max, item) => {
     return Math.max(item.y + item.h || 0, max);
   }, 0);

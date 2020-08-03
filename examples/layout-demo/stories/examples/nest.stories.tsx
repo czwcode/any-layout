@@ -188,7 +188,6 @@ export const Atom自定义渲染 = () => {
       <AnyLayout
         AtomRenderer={(props) => {
           const { width, height, node } = props;
-          console.log(node.state);
           return (
             <div
               style={{
@@ -212,10 +211,11 @@ export const 外部拖入 = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <DragFrame
-        data={{
+        getData={() => ({
+          id: uuid(),
           type: 'nestAtom',
           h: 6,
-        }}
+        })}
       >
         <div style={{ width: 200, padding: 12, border: '1px solid #23a' }}>
           外部组件
@@ -225,7 +225,7 @@ export const 外部拖入 = () => {
         onLayoutChange={(layout) => {
           console.log('layout', layout);
         }}
-        dragLayerFrameRenderer={() => {
+        DragBoxRenderer={() => {
           return <div>自定义拖拽</div>;
         }}
         layout={[

@@ -24,16 +24,7 @@ const Widget: IComponent<IGridLayoutTheme> = {
     const globalContext = useGlobalContext();
     const { AtomRenderer } = globalContext;
     const size = React.useContext(SizeContext);
-    const preLayerContext = usePrevious(layerContext);
-    const preSizee = usePrevious(size);
-    const preGlobslContexy = usePrevious(globalContext);
     const { width, height } = getBoundingRect(theme, size.width, layout);
-    console.log(
-      'render',
-      layerContext === preLayerContext,
-      size === preSizee,
-      globalContext === preGlobslContexy
-    );
     return (
       <div
         className='absolute-atom'
