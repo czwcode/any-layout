@@ -1,6 +1,6 @@
 ### [Demos](https://chenzhiwei199.github.io/any-layout/)
 
-### [Docs](https://chenzhiwei199.github.io/any-layout/doc)
+### [Docs](https://chenzhiwei199.github.io/any-layout/docs)
 
 ### 安装
   `yarn install`

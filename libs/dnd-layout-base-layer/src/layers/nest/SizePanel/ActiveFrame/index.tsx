@@ -25,7 +25,6 @@ const ActiveFrame = (props: IActiveFrame) => {
   } = props;
   
   const frame = React.useRef<HTMLDivElement>(null);
-  console.log('active: ', active, frame);
   const forceUpdate = useForceUpdate()
   React.useEffect(() => {
     forceUpdate()
