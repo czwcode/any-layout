@@ -13,6 +13,7 @@ module.exports = {
   ],
   webpackFinal: async (config, a) => {
     // console.log('arguments: ', arguments);
+    config.devtool = false
     config.resolve.plugins = [
       new TsconfigPathsPlugin({
         configFile: './tsconfig.json'

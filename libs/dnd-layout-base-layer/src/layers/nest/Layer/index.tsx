@@ -11,7 +11,7 @@ import {
 import { NestLayoutType } from '../../../types/componentTypes';
 import { getRowNode } from '../Row';
 import { IAnySizeOptions } from '../../../types/layout';
-import { INestLayoutTheme } from '../../../context/layerContext';
+import { INestLayoutTheme, useLayerContext } from '../../../context/layerContext';
 import { useGlobalContext } from '../../../context/GlobalContext';
 export const AbsoluteLayerType = 'absoluteLayer';
 
@@ -39,6 +39,7 @@ const Row: IComponent<INestLayoutTheme> = {
   atomType: NestLayoutType.Layer,
   renderer: (props: IComponentRender) => {
     const { interact }  = useGlobalContext<INestLayoutTheme>()
+    const layerContext = useLayerContext<INestLayoutTheme>()
     const { onDrop} = interact
     const { layout, path } = props;
     return (
@@ -51,7 +52,9 @@ const Row: IComponent<INestLayoutTheme> = {
         {props.children}
         <PlaceHolder
           style={{ height: 200 }}
-          onDrop={onDrop}
+          onDrop={(dragPath, dropPath, options) => {
+            onDrop(dragPath, dropPath, { ...options, layerContext})
+          }}
           path={path}
           layout={layout}
         />
