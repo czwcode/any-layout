@@ -25,7 +25,7 @@ export function TreeTravse<T extends { children?: TreeData<T>[] }>(
   } = props;
   return (
     <>
-      {dataSource.map((currentLayout, index) => {
+      {(dataSource || []).map((currentLayout, index) => {
         const currentPath = [...path, index];
         console.log("key", getKey(currentLayout, currentPath), currentLayout, dataSource)
         return (

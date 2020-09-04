@@ -7,6 +7,7 @@ import {
 
 export interface IComponentRender {
   layout: ILayout;
+  parent?: ILayout
   path: number[];
   children?: React.ReactNode;
 }
@@ -29,7 +30,7 @@ export interface ISizeProcess<ITheme> {
   size: ISize;
   theme: ITheme;
 }
-const __ATOMS__ = {} as {
+let __ATOMS__ = {} as {
   [key: string]: IComponent<any>;
 };
 
@@ -44,6 +45,10 @@ export function regist(atom: IComponent<any>) {
   __ATOMS__[atomType] = atom;
 }
 
+
+export function clearRegist() {
+  __ATOMS__ = {}
+}
 /**
  * 获取注册信息的方法
  *

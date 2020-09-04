@@ -9,7 +9,7 @@ import {
   SizeContext,
   DragDirection,
   ISizeOptions,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
 import { toReal } from '../../../utils/calcWidth';
 import { useAnyLayoutDrag } from '../../../hooks/useAnyDrag';

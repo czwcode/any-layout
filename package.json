@@ -2,12 +2,12 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "start": "yarn workspace dnd-layout-demo start",
+    "start": "yarn workspace @czwcode/dnd-layout-demo start",
     "bootstrap": "lerna bootstrap",
     "clean": " lerna exec -- rm -rf node_modules",
     "watch": "lerna run --parallel watch ",
     "doc": "lerna run  --parallel doc && yarn typedoc ",
-    "typedoc": "typedoc --mode file  --out docs/docs libs/dnd-layout/src/",
+    "typedoc": "typedoc --mode file  --out docs/docs libs/@czwcode/dnd-layout/src/",
     "build": "lerna run build"
   },
   "workspaces": [

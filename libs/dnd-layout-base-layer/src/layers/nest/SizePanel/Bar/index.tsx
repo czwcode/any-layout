@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { DragDirection } from 'dnd-layout-renderer';
+import { DragDirection } from '@czwcode/dnd-layout-renderer';
 const StyledDiv = styled.div`
   .drag-layout-bar {
     position: absolute;
@@ -154,7 +154,7 @@ class Bar extends Component<BarProps> {
 
   render() {
     const { simple, prefix, offsetX, offsetY, isActive, position } = this.props;
-    let style = { zIndex: 10} as React.CSSProperties;
+    let style = { zIndex: 10 } as React.CSSProperties;
     if (isActive) {
       style.transform = `translate(${offsetX}px, ${offsetY}px)`;
     }

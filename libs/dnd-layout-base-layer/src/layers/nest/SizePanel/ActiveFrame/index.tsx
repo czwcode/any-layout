@@ -1,14 +1,17 @@
 import React, { useRef } from 'react';
-import DragPaneWrapper, { DragPaneWrapperProps, useForceUpdate } from '../DragWrapper';
-import { encodePath } from 'dnd-layout-renderer';
+import DragPaneWrapper, {
+  DragPaneWrapperProps,
+  useForceUpdate,
+} from '../DragWrapper';
+import { encodePath } from '@czwcode/dnd-layout-renderer';
 type IActiveFrame = DragPaneWrapperProps & {
   width?: number;
   height?: number;
-  left?: number
-  top?: number
+  left?: number;
+  top?: number;
   onActive: () => void;
   active: boolean;
-  children?: React.ReactNode
+  children?: React.ReactNode;
   ActiveOperateComponent: () => React.ReactNode;
 };
 const ActiveFrame = (props: IActiveFrame) => {
@@ -23,12 +26,12 @@ const ActiveFrame = (props: IActiveFrame) => {
     children,
     ActiveOperateComponent,
   } = props;
-  
+
   const frame = React.useRef<HTMLDivElement>(null);
-  const forceUpdate = useForceUpdate()
+  const forceUpdate = useForceUpdate();
   React.useEffect(() => {
-    forceUpdate()
-  }, [])
+    forceUpdate();
+  }, []);
   // const copyFunc = () => {
   //   return layoutCore.updateLayoutWhenDrop(DragDirection.BOTTOM, path, layout, true)
   // }
@@ -47,21 +50,15 @@ const ActiveFrame = (props: IActiveFrame) => {
         top: top || 0,
         left: left || 0,
         width: width || '100%',
-        height: height ||'100%',
+        height: height || '100%',
         position: 'absolute',
       }}
     >
       {active && ActiveOperateComponent && ActiveOperateComponent()}
       {active && frame.current && (
-        <DragPaneWrapper
-          {...props}
-          layer={layer}
-          widgetLayer={frame.current}
-        />
+        <DragPaneWrapper {...props} layer={layer} widgetLayer={frame.current} />
       )}
-      {
-        children
-      }
+      {children}
     </div>
   );
 };

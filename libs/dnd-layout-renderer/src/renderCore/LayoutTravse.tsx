@@ -1,7 +1,6 @@
 import React, { useMemo, useContext } from 'react';
 import { ILayout, INode } from '../types';
 import { getRegist, IComponentRender } from '../register';
-import { getMemoWrapper } from '../../../dnd-layout-base-layer/src/MemoWrapper';
 import { TreeTravse, ITreeTravseRenderer } from './TreeTravser';
 import {
   LayoutTravseContext,

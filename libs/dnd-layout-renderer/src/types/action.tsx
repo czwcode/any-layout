@@ -10,7 +10,11 @@ export interface Position {
 
 export enum DragDirection {
   Left = 'left',
+  LeftTop = 'leftTop',
+  LeftBottom = 'leftBottom',
   Right = 'right',
+  RightTop = 'rightTop',
+  RightBottom = 'rightBottom',
   Bottom = 'bottom',
   Top = 'top',
 }

@@ -8,16 +8,14 @@ import {
   DropOptions,
   INode,
   SizeContext,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { calcDirection, HoverDirection } from './calcHover';
 import DirectionOverlap from './DirectionOverlap';
 import ActiveFrame from '../SizePanel/ActiveFrame';
 import { useAnyLayoutDragAndDop } from '../../../hooks/useAnyDragAndDrop';
 import { calcMovePosition } from '../../../utils/calcPosition';
-import { toVirtual } from '../../../utils/calcWidth';
 import { IAnySizeOptions } from '../../../types/layout';
 import {
-  LayerContext,
   INestLayoutTheme,
   useLayerContext,
 } from '../../../context/layerContext';

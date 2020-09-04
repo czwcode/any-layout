@@ -9,7 +9,7 @@ import {
   INode,
   DragDirection,
   ISizeOptions,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { getColNode } from '../Col';
 import { calcDirection, HoverDirection } from '../Atom/calcHover';
 import {

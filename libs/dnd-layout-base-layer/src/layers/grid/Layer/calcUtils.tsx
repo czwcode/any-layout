@@ -5,7 +5,7 @@ import {
   BaseDndOptions,
   XYCoord,
   DragDirection,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { IGridLayoutTheme, ILayerContext } from '../../../context/layerContext';
 import { calcMovePosition } from '../../../utils/calcPosition';
 import { toVirtual } from '../../../utils/calcWidth';
@@ -202,7 +202,6 @@ export type IRelayoutOptions = BaseDndOptions & {
  * @param {AnyDropOptions} options
  */
 export function relayoutNodes(fakeNode: INode, children: ILayout[]) {
-  
   // 生成真实假节点的位置
   const newNodes = sortNodes(children);
   layoutNodes(newNodes, fakeNode);

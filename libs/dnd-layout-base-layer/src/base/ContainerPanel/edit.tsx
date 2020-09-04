@@ -1,6 +1,6 @@
 import React from 'react';
 import PreviewContiner from './preview';
-import { IComponentRender } from 'dnd-layout-renderer';
+import { IComponentRender } from '@czwcode/dnd-layout-renderer';
 
 const EditContainer = {
   ...PreviewContiner,

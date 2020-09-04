@@ -11,7 +11,7 @@ import {
   SizeContext,
   ISizeProcess,
   InteractiveCore,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import {
   LayerContext,
   defaultTheme,
@@ -28,7 +28,6 @@ import {
 } from './context/GlobalContext';
 import { getMemoWrapper } from './MemoWrapper';
 import { defaultAtomRenderer } from './utils/rendererHelp';
-import { usePrevious } from './layers/grid/Layer';
 
 export interface IAnyLayout extends IRenderCore {
   theme?: ILayoutTheme;
@@ -67,7 +66,12 @@ function TravseRendererFrame(props: ITravseRendererFrame) {
       }, [currentTheme, currentWidth])}
     >
       <SizeWrapper {...props}>
-        <MemoWrapper layout={layout} active={active} path={path} key={layout.id}>
+        <MemoWrapper
+          layout={layout}
+          active={active}
+          path={path}
+          key={layout.id}
+        >
           {children}
         </MemoWrapper>
       </SizeWrapper>
@@ -123,10 +127,12 @@ export function AnyLayout(props: IAnyLayout) {
     theme = defaultTheme,
     AtomRenderer,
     onActive,
+    onLayoutChange
   } = props;
   const interactiveCoreRef = React.useRef(new InteractiveCore(layout));
   const [storeLayout, setStoreLayout] = React.useState(null);
   React.useEffect(() => {
+    console.log('useEffect: ');
     interactiveCoreRef.current.update(layout);
     setStoreLayout(interactiveCoreRef.current.get());
   }, [layout]);
@@ -140,6 +146,7 @@ export function AnyLayout(props: IAnyLayout) {
     const interact: IInteractive<any> = createMutators({
       onLayoutChange: (layout) => {
         setStoreLayout(layout);
+        onLayoutChange(layout)
       },
       interactiveCoreRef,
       setActiveStatePath: (path) => {

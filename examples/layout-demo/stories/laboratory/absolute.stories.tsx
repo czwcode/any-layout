@@ -1,7 +1,8 @@
-import React from 'react';
-import {  DragFrame, AnyLayout } from 'dnd-layout';
+import React, { useState } from 'react';
+import { DragFrame, AnyLayout } from '@czwcode/dnd-layout';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { Button } from '@alifd/next';
 export default {
   title: '实验室/绝对布局',
   parameters: {
@@ -10,9 +11,17 @@ export default {
 };
 
 export const RenderCoreTest = () => {
+  const [state, setState] = useState()
   return (
     <DndProvider backend={HTML5Backend}>
+      <Button onClick={() => {
+        setState(null)
+      }}>测试刷新</Button>
       <AnyLayout
+        AtomRenderer={() => {
+          console.log("刷新拉")
+          return <div>111</div>
+        }}
         onLayoutChange={() => {}}
         layout={[
           {
@@ -35,7 +44,7 @@ export const RenderCoreTest = () => {
                         w: 6,
                         h: 200,
                         x: 100,
-                        y: 100
+                        y: 100,
                       },
                       {
                         id: '55',
@@ -43,7 +52,7 @@ export const RenderCoreTest = () => {
                         w: 6,
                         h: 200,
                         x: 200,
-                        y: 200
+                        y: 200,
                       },
                     ],
                   },
@@ -56,4 +65,3 @@ export const RenderCoreTest = () => {
     </DndProvider>
   );
 };
-

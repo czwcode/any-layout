@@ -9,11 +9,11 @@ import {
   DropOptions,
   INode,
   ISizeOptions,
-} from 'dnd-layout-renderer';
-import { ISizeContext } from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
+import { ISizeContext } from '@czwcode/dnd-layout-renderer';
 import { toReal, toVirtual } from '../../../utils/calcWidth';
 import { calcDirection, HoverDirection } from '../Atom/calcHover';
-import { SizeContext } from '../../../../../dnd-layout-renderer/src/context/sizeContext';
+import { SizeContext } from '@czwcode/dnd-layout-renderer/src/context/sizeContext';
 import {
   INestLayoutTheme,
   LayerContext,

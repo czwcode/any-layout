@@ -4,7 +4,7 @@
     // "declarationDir": "lib/types",
     "baseUrl": ".",
     "paths": {
-      "*": ["libs/*/src"]
+      "@czwcode/*": ["libs/*/src"]
     }
   },
   "typedocOptions": {

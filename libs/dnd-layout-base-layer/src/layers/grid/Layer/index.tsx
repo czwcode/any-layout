@@ -7,7 +7,7 @@ import {
   ILayout,
   SizeContext,
   DragDirection,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { toReal, toVirtual } from '../../../utils/calcWidth';
 import {
   IGridLayoutTheme,
@@ -128,7 +128,14 @@ const GridLayer: IComponent<INestLayoutTheme> = {
     const { theme } = useLayerContext<IGridLayoutTheme>();
     const size = React.useContext(SizeContext);
     const placeholderRef = React.useRef<HTMLDivElement>(null);
+
+    
     const { layout, path } = props;
+    const { width, height, left, top } = getBoundingRect(
+      theme,
+      size.width,
+      layout
+    );
     const { interact } = useGlobalContext<IGridLayoutTheme>();
     let { onMove, onDrop } = interact;
     const [position, setPosition] = React.useState<{
@@ -179,8 +186,8 @@ const GridLayer: IComponent<INestLayoutTheme> = {
         ref={ref}
         className='absolute-layer'
         style={{
-          width: toReal(layout.w, size.width),
-          height: layout.h,
+          width: width,
+          height: height,
           position: 'relative',
           backgroundSize: '10px 10px',
           backgroundPosition: '1px 1px',

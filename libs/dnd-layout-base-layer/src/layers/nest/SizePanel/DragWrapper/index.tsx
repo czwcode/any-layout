@@ -9,10 +9,10 @@ import {
   DragDirection,
   XYCoord,
   ISizeOptions,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 export interface DragPaneWrapperProps {
   path: number[];
-  realTimeChange?: boolean
+  realTimeChange?: boolean;
   onStartSizeChange?: () => void;
   onSizeChangeEnd?: () => void;
   onSizeChange?: (options: ISizeOptions) => void;
@@ -34,7 +34,17 @@ export interface DragPaneWrapperState {
 }
 // export default () => <div />
 export default function DragPaneWrapper(props: DragPaneWrapperProps) {
-  const { parent, path,realTimeChange = false, onSizeChange, onSizeChanging, onSizeChangeEnd, onStartSizeChange: onSizeChangeStart, layer, widgetLayer } = props;
+  const {
+    parent,
+    path,
+    realTimeChange = false,
+    onSizeChange,
+    onSizeChanging,
+    onSizeChangeEnd,
+    onStartSizeChange: onSizeChangeStart,
+    layer,
+    widgetLayer,
+  } = props;
   const deltaRef = useRef<{ deltaX: number; deltaY: number }>({
     deltaX: 0,
     deltaY: 0,
@@ -68,7 +78,7 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
   ) => {
     const x = event.clientX;
     const y = event.clientY;
-    onSizeChangeStart && onSizeChangeStart()
+    onSizeChangeStart && onSizeChangeStart();
     setDragPaneWrapperState((dragPaneWrapperState) => {
       return produce(
         dragPaneWrapperState,
@@ -93,17 +103,18 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
           deltaX: x - initialPosX,
           deltaY: y - initialPosY,
         };
-        onSizeChanging && onSizeChanging({
-          direction: activeDragBarDirection,
-          originMouseClientOffset: {
-            x: dragPaneWrapperState.initialPosX,
-            y: dragPaneWrapperState.initialPosY,
-          },
-          mouseClientOffset: {
-            x,
-            y,
-          },
-        });
+        onSizeChanging &&
+          onSizeChanging({
+            direction: activeDragBarDirection,
+            originMouseClientOffset: {
+              x: dragPaneWrapperState.initialPosX,
+              y: dragPaneWrapperState.initialPosY,
+            },
+            mouseClientOffset: {
+              x,
+              y,
+            },
+          });
         setDragPaneWrapperState((dragPaneWrapperState) => {
           return produce(
             dragPaneWrapperState,
@@ -125,17 +136,18 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
         const { deltaY, deltaX } = deltaRef.current;
         const x = event.clientX;
         const y = event.clientY;
-        onSizeChange && onSizeChange({
-          direction: activeDragBarDirection,
-          originMouseClientOffset: {
-            x: dragPaneWrapperState.initialPosX,
-            y: dragPaneWrapperState.initialPosY,
-          },
-          mouseClientOffset: {
-            x,
-            y,
-          },
-        });
+        onSizeChange &&
+          onSizeChange({
+            direction: activeDragBarDirection,
+            originMouseClientOffset: {
+              x: dragPaneWrapperState.initialPosX,
+              y: dragPaneWrapperState.initialPosY,
+            },
+            mouseClientOffset: {
+              x,
+              y,
+            },
+          });
         setDragPaneWrapperState((dragPaneWrapperState) => {
           return produce(
             dragPaneWrapperState,
@@ -197,7 +209,7 @@ export default function DragPaneWrapper(props: DragPaneWrapperProps) {
       isFirst={currentColumnIndex === 0}
       isLast={currentColumnIndex === get(parent, ['children'], []).length - 1}
       offsetX={realTimeChange ? 0 : deltaX}
-      offsetY={realTimeChange ? 0: deltaY}
+      offsetY={realTimeChange ? 0 : deltaY}
       startResize={startResize}
     />
   );

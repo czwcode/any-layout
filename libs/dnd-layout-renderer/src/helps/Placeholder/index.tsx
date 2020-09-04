@@ -1,5 +1,10 @@
 import React from 'react';
-import { useLayoutDrop, ILayout, IDropConfig, DropOptions } from 'dnd-layout-renderer';
+import {
+  useLayoutDrop,
+  ILayout,
+  IDropConfig,
+  DropOptions,
+} from '@czwcode/dnd-layout-renderer';
 
 export interface IPlaceHolder extends IDropConfig<DropOptions> {
   layout: ILayout;

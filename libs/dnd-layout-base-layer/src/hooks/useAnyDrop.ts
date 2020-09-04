@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { useLayoutDrop, IDropConfig, DropOptions } from 'dnd-layout-renderer';
+import {
+  useLayoutDrop,
+  IDropConfig,
+  DropOptions,
+} from '@czwcode/dnd-layout-renderer';
 import {
   IAnyLayoutTheme,
   LayerContext,

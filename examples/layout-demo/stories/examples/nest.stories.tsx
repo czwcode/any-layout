@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RenderCore, DragFrame, ILayout, AnyLayout } from 'dnd-layout';
+import { RenderCore, DragFrame, ILayout, AnyLayout } from '@czwcode/dnd-layout';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import uuid from 'uuid';
@@ -317,7 +317,8 @@ export const 外部修改atom状态 = () => {
       <button
         onClick={() => {
           const newLayout = produce(layout, (layout) => {
-            layout[0].children[0].children[0].children[0].children[0].children[0].state.a++;
+            layout[0].children[0].children[0].children[0].children[0]
+              .children[0].state.a++;
           });
           setLayout(newLayout);
         }}

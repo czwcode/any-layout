@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import clazz from 'classnames';
 import Bar, { DIRECTION, POSITION } from '../Bar';
 import styled from 'styled-components';
-import { DragDirection } from 'dnd-layout-renderer';
+import { DragDirection } from '@czwcode/dnd-layout-renderer';
 
 const StyledDiv = styled.div`
   &.drag-panel.active {

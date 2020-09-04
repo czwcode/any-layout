@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { ILayout, IComponentRender } from 'dnd-layout-renderer';
+import { ILayout, IComponentRender } from '@czwcode/dnd-layout-renderer';
 function Wrapper({ children }: { layout: ILayout; children: React.ReactNode }) {
   return <>{children}</>;
 }
@@ -22,10 +22,14 @@ export function getMemoWrapper() {
           nextProps[key] === undefined && preProps[key] === undefined
             ? true
             : preProps[key] === nextProps[key];
+            if(!isEqual) {
+              console.log("path", key)
+            }
         return isEqual;
       });
       const isPathEuqal =
         (nextProps.path || []).join(',') === (preProps.path || []).join(',');
+        console.log('isPathEuqal: ' + nextProps.path, isPathEuqal, isEqual, nextProps, preProps);
       return isPathEuqal && isEqual;
     });
   }

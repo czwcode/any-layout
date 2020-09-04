@@ -3,24 +3,47 @@ import {
   EditContainerPanel,
   Row,
   Col,
-  EditAtom,
+  EditNestAtom,
   AbsoluteLayer,
   AbsoluteAtom,
   GridAtom,
   GridLayer,
-  NestLayer
-} from 'dnd-layout-base-layer';
-export * from 'dnd-layout-renderer';
-export * from 'dnd-layout-base-layer'
-import { regist } from 'dnd-layout-renderer';
+  NestLayer,
+  PreviewGridAtom,
+} from '@czwcode/dnd-layout-base-layer';
+import {
+  PreviewContainer,
+  PreviewNestAtom,
+  PreviewContainerPanel,
+} from '@czwcode/dnd-layout-base-layer';
+export * from '@czwcode/dnd-layout-renderer';
+export * from '@czwcode/dnd-layout-base-layer';
+import { regist, clearRegist } from '@czwcode/dnd-layout-renderer';
 
-regist(EditContainer);
-regist(EditContainerPanel);
-regist(Row);
-regist(Col);
-regist(EditAtom);
-regist(AbsoluteLayer);
-regist(AbsoluteAtom);
-regist(GridLayer);
-regist(GridAtom);
-regist(NestLayer);
+export function registPreview() {
+  clearRegist()
+  regist(EditContainer);
+  regist(EditContainerPanel);
+  regist(Row);
+  regist(Col);
+  regist(PreviewNestAtom);
+  regist(AbsoluteLayer);
+  regist(AbsoluteAtom);
+  regist(GridLayer);
+  regist(PreviewGridAtom);
+  regist(NestLayer);
+}
+export function registEditor() {
+  clearRegist()
+  regist(EditContainer);
+  regist(EditContainerPanel);
+  regist(Row);
+  regist(Col);
+  regist(EditNestAtom);
+  regist(AbsoluteLayer);
+  regist(AbsoluteAtom);
+  regist(GridLayer);
+  regist(GridAtom);
+  regist(NestLayer);
+  
+}

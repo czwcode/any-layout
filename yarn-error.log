@@ -26,7 +26,7 @@ npm manifest:
     "name": "root",
     "private": true,
     "scripts": {
-      "start": "yarn workspace dnd-layout-demo start",
+      "start": "yarn workspace @czwcode/dnd-layout-demo start",
       "bootstrap": "lerna bootstrap",
       "clean": " lerna exec -- rm -rf node_modules",
       "watch": "lerna run --parallel watch ",

@@ -1,7 +1,11 @@
 const createCompiler = require('@storybook/addon-docs/mdx-compiler-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const IgnorePlugin = require('./ignorePlugins')
-const webpack = require('webpack')
+const IgnorePlugin = require('./ignorePlugins');
+const os =  require('os')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
+const webpack = require('webpack');
+
 module.exports = {
   target: 'node',
   stories: ['../stories/**/*.stories.tsx', '../stories/**/*.stories.mdx'],
@@ -13,10 +17,11 @@ module.exports = {
   ],
   webpackFinal: async (config, a) => {
     // console.log('arguments: ', arguments);
-    config.devtool = false
+    // config.devtool = false;
+
     config.resolve.plugins = [
       new TsconfigPathsPlugin({
-        configFile: './tsconfig.json'
+        configFile: './tsconfig.json',
       }),
       // new webpack.ContextReplacementPlugin(/knex\/lib\/dialects/, /postgres\/index.js/),
       // new IgnorePlugin(

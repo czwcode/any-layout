@@ -5,10 +5,9 @@ import {
   IComponentRender,
   ISizeContext,
   SizeContext,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import {
   INestLayoutTheme,
-  LayerContext,
   useLayerContext,
 } from '../../../context/layerContext';
 import { useGlobalContext } from '../../../context/GlobalContext';
@@ -28,7 +27,7 @@ const Widget: IComponent<INestLayoutTheme> = {
     };
   },
   renderer: (props: IComponentRender) => {
-    const { layout, children, path } = props;
+    const { layout, children, path, parent } = props;
     const lastPath = path[path.length - 1];
     const size = React.useContext<ISizeContext>(SizeContext);
     const { width, height } = size;
@@ -46,7 +45,7 @@ const Widget: IComponent<INestLayoutTheme> = {
           ...theme.atom.style,
         }}
       >
-        <AtomRenderer node={layout} width={width} height={height} />
+        <AtomRenderer parent={parent} node={layout} width={width} height={height} />
         {children}
       </div>
     );

@@ -7,11 +7,14 @@ import {
   Action,
   DropOptions,
   INode,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { NestLayoutType } from '../../../types/componentTypes';
 import { getRowNode } from '../Row';
 import { IAnySizeOptions } from '../../../types/layout';
-import { INestLayoutTheme, useLayerContext } from '../../../context/layerContext';
+import {
+  INestLayoutTheme,
+  useLayerContext,
+} from '../../../context/layerContext';
 import { useGlobalContext } from '../../../context/GlobalContext';
 export const AbsoluteLayerType = 'absoluteLayer';
 
@@ -25,7 +28,10 @@ class LayerAction extends Action {
   onMove(dragPath: number[], dropPath: number[], options: DropOptions): void {
     throw new Error('Method not implemented.');
   }
-  onSizeChange(path: number[], options: IAnySizeOptions<INestLayoutTheme>): void {
+  onSizeChange(
+    path: number[],
+    options: IAnySizeOptions<INestLayoutTheme>
+  ): void {
     throw new Error('Method not implemented.');
   }
   onDrop(dragPath: number[], dropPath: number[], options: DropOptions): void {
@@ -38,9 +44,9 @@ const Row: IComponent<INestLayoutTheme> = {
   action: LayerAction,
   atomType: NestLayoutType.Layer,
   renderer: (props: IComponentRender) => {
-    const { interact }  = useGlobalContext<INestLayoutTheme>()
-    const layerContext = useLayerContext<INestLayoutTheme>()
-    const { onDrop} = interact
+    const { interact } = useGlobalContext<INestLayoutTheme>();
+    const layerContext = useLayerContext<INestLayoutTheme>();
+    const { onDrop } = interact;
     const { layout, path } = props;
     return (
       <div
@@ -53,7 +59,7 @@ const Row: IComponent<INestLayoutTheme> = {
         <PlaceHolder
           style={{ height: 200 }}
           onDrop={(dragPath, dropPath, options) => {
-            onDrop(dragPath, dropPath, { ...options, layerContext})
+            onDrop(dragPath, dropPath, { ...options, layerContext });
           }}
           path={path}
           layout={layout}

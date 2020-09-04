@@ -1,5 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "exclude": ["node_modules"],
-  "include": ["src/**/*", "../dnd-layout-renderer/src/helps/Placeholder"],
+  "include": [
+    "src/**/*",
+    "../@czwcode/dnd-layout-renderer/src/helps/Placeholder"
+  ]
 }

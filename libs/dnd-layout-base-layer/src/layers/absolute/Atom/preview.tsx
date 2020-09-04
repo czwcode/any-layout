@@ -4,7 +4,7 @@ import {
   LayoutType,
   IComponentRender,
   SizeContext,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
 export const AtomType = 'absoluteAtom';
 

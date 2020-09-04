@@ -1,4 +1,4 @@
-import { ISizeOptions, INode } from 'dnd-layout-renderer';
+import { ISizeOptions, INode } from '@czwcode/dnd-layout-renderer';
 import { ILayerContext, IAnyLayoutTheme } from '../context/layerContext';
 
 export interface IAnySizeOptions<ITheme> extends ISizeOptions {

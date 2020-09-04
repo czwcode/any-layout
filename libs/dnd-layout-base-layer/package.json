@@ -1,5 +1,5 @@
 {
-  "name": "dnd-layout-base-layer",
+  "name": "@czwcode/dnd-layout-base-layer",
   "version": "0.1.0",
   "description": "1",
   "main": "dist/index.js",
@@ -9,15 +9,6 @@
     "fusion",
     "layout2"
   ],
-  "author": {
-    "name": "leo.czw",
-    "email": "leo.czw@alibaba-inc.com"
-  },
-  "builder": {
-    "feature": {
-      "typescript": true
-    }
-  },
   "scripts": {
     "lint": "npm run eslint && npm-ensure -t deps",
     "eslint": "eslint 'src/**/*.@(js|jsx)' --fix",
@@ -25,25 +16,8 @@
     "watch": "tsc -w -p ./tsconfig.build.json",
     "precommit": "lint-staged"
   },
-  "lint-staged": {
-    "src/**/*.@(js|jsx)": [
-      "eslint --fix",
-      "npm-ensure -t deps",
-      "git add"
-    ]
-  },
-  "ensure": {
-    "deps": {
-      "checkDirs": [
-        "src/**/*"
-      ]
-    }
-  },
-  "just": {
-    "type": "component/wdk-comp"
-  },
   "dependencies": {
-    "dnd-layout-renderer": "^0.1.0"
+    "@czwcode/dnd-layout-renderer": "^0.1.0"
   },
   "devDependencies": {
     "@types/uuid": "^3.4.7",

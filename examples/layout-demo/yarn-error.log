@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npm.alibaba-inc.com/dnd-layout: [not_found] document not found
+  Error: https://registry.npm.alibaba-inc.com/@czwcode/dnd-layout: [not_found] document not found
       at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66975:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140727:22)
       at Request.emit (events.js:311:20)
@@ -28,7 +28,7 @@ Trace:
 
 npm manifest: 
   {
-    "name": "dnd-layout-demo",
+    "name": "@czwcode/dnd-layout-demo",
     "private": true,
     "version": "1.0.54",
     "description": "",
@@ -45,7 +45,7 @@ npm manifest:
     "license": "ISC",
     "dependencies": {
       "@types/react": "^16.9.38",
-      "dnd-layout": "0.1.0",
+      "@czwcode/dnd-layout": "0.1.0",
       "react": "^16.13.1",
       "react-is": "^16.13.1"
     },

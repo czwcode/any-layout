@@ -4,7 +4,7 @@ import {
   LayoutType,
   IComponentRender,
   SizeContext,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import {
   IGridLayoutTheme,
   useLayerContext,
@@ -24,7 +24,22 @@ const Widget: IComponent<IGridLayoutTheme> = {
     const globalContext = useGlobalContext();
     const { AtomRenderer } = globalContext;
     const size = React.useContext(SizeContext);
-    const { width, height } = getBoundingRect(theme, size.width, layout);
+    const { width, height, left, top } = getBoundingRect(
+      theme,
+      size.width,
+      layout
+    );
+    const style: React.CSSProperties = React.useMemo(() => {
+      return {
+        // transform: `translate(${left}px, ${top}px)`,
+        width: width,
+        height: height,
+        position: 'absolute',
+        top: top,
+        left: left,
+        border: '1px dashed lightgrey',
+      };
+    }, [width, height, left, top]);
     return (
       <div
         className='absolute-atom'
@@ -32,8 +47,8 @@ const Widget: IComponent<IGridLayoutTheme> = {
           marginTop: theme.gapY,
           position: 'relative',
           background: 'white',
-          height: height,
-          width: width,
+          transition: 'all 200ms ease',
+          ...style
         }}
       >
         <AtomRenderer node={layout} width={width} height={height} />

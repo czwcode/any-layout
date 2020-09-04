@@ -9,7 +9,7 @@ import {
   DropOptions,
   SizeContext,
   ISizeOptions,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { toReal } from '../../../utils/calcWidth';
 import { LayerContext, useLayerContext } from '../../../context/layerContext';
 import { calcMovePosition } from '../../../utils/calcPosition';

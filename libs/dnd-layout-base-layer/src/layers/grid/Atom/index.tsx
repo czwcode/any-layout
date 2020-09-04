@@ -8,7 +8,7 @@ import {
   INode,
   ISizeContext,
   SizeContext,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import ActiveFrame from '../../nest/SizePanel/ActiveFrame';
 import {
   IGridLayoutTheme,
@@ -77,29 +77,16 @@ const EditContainer = {
       path,
     });
 
-    const { width, height, left, top } = getBoundingRect(
+    const { width, height } = getBoundingRect(
       theme,
       size.width,
       layout
     );
-    const style: React.CSSProperties = React.useMemo(() => {
-      return {
-        // transform: `translate(${left}px, ${top}px)`,
-        width: width,
-        height: height,
-        position: 'absolute',
-        top: top,
-        left: left,
-        border: '1px dashed lightgrey',
-      };
-    }, [width, height, left, top]);
-    console.log("active", active, layout.id)
     return (
       <>
         <div
           ref={ref}
           className='grid-atom-edit'
-          style={{ transition: 'all 200ms ease', ...style }}
         >
           <div style={{ position: 'relative', width: '100%', height: '100%' }}>
             <ActiveFrame

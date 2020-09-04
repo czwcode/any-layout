@@ -4,7 +4,7 @@ import {
   INode,
   DragDirection,
   ISizeOptions,
-} from 'dnd-layout-renderer';
+} from '@czwcode/dnd-layout-renderer';
 import { IAnyLayoutTheme, ILayerContext } from '../context/layerContext';
 
 export interface IAnyDropOptions<ITheme> extends DropOptions {

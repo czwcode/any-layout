@@ -96,8 +96,16 @@ action: onSizeChange onDrag onDrop onMove
 - 开始拖拽 (onDrag)
 - 作用域(可能同时渲染编辑态和预览态)
 
-
 ### 特殊问题解决
 1. 当拖拽时，是移除原来的组件，还是通过标记的方式呢？
   - 移除
     带来的问题是，
+    
+### 布局方式
+
+#### 绝对布局（https://zhuanlan.zhihu.com/p/92469406）
+ - 辅助线类型(参考地址： https://github.com/think2011/ref-line)
+  对齐（与哪些组件边框线对齐）
+  吸附（多少距离内时吸附）
+  距离（与哪些组件边框线考虑展示距离）
+  冲突检测
